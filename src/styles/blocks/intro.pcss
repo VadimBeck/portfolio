@@ -1,0 +1,46 @@
+.intro {
+  height: 100vh;
+  min-height: 650px;  
+  margin-bottom: 150px;
+}
+
+.intro__container {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: max-content 1fr max-content;
+  grid-template-areas:
+    "header"
+    "content"
+    "buttons";
+}
+
+.intro__header {
+  grid-area: header;
+  padding-top: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.intro__logo {
+  font-size: 36px;
+  font-weight: 800;
+}
+
+.intro__menu {
+  margin: 0 90px;
+  flex: 1;
+}
+
+.intro__content {
+  grid-area: content;
+  justify-self: center;
+  align-self: center;
+}
+
+.intro__buttons {
+  grid-area: buttons;
+  justify-self: center;
+  padding: 50px; 
+}

@@ -1,0 +1,52 @@
+.parallax {
+  position: absolute;
+  width: 100%;
+  height: 100%;  
+}
+.parallax__list {
+  width: 100%;
+  height: 100%;
+}
+.parallax__item {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  &--sky {
+    top:0;
+  }
+  &--mountain {
+    top: 12%;
+  }
+  &--baloon {
+    top: 18%;
+    & .parallax__img {
+      max-width: 18%;
+      right: 2%;
+    }   
+  }
+  &--cloud {
+    top: 22%;
+  }
+  &--man {
+    width: 80%;
+    top: 25%;
+    & .parallax__img {
+      left: -10%;
+    }  
+  }
+  &--snow {
+    top: 20%;
+    right: -10%;
+  }
+  &--white {
+    bottom: 0;
+    & .parallax__img {
+      bottom: 0;
+    } 
+  }
+}
+
+.parallax__img {
+  position: absolute;
+  max-height: none;
+}

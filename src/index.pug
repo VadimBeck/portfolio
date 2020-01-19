@@ -1,4 +1,6 @@
 include ./mixins.pug
+include ./components/socials.pug
+include ./components/menu.pug
 
 <!DOCTYPE html>
 html(lang="en")
@@ -9,7 +11,265 @@ html(lang="en")
     title Portfolio | main page
   body
     .wrapper
-      .maincontent
-        +image('content/user.jpg', 'user-pic')
-        +icon('link', 'link-class')
-        .icon-bg
+      .welcome-section
+        .parralax
+          ul.parallax__list              
+            li.parralax__item
+              picture.parallax__img                  
+                source(srcset=require('images/main-small.jpg') media="(max-width: 768px)")
+                source(srcset=require('images/parallax/sky.png'))
+                img(src=require('images/main-static.jpg'))
+            -var layers = ['mountain', 'baloon', 'cloud', 'man', 'snow', 'white']
+            each item in layers
+              li.parallax__item(class=`parallax__item--${item}`)
+                picture.parallax__img
+                  source(srcset=require(`images/parallax/${item}.png`) media="(min-width: 769px)")
+                  img(srcset='')
+        section.intro
+          .container.intro__container
+            header.header.intro__header
+              .intro__logo
+                .logo ВБ
+              .intro__menu
+                +menu("header")
+              .intro__links
+                +socials("header")
+            .intro__content
+              .user-info
+                .user-info__desc
+                  | Личный сайт 
+                  br
+                  | веб разработчика
+                .user-info__name Вадим Бекитко
+            .intro__buttons
+              .scroll
+                a.scroll__link(href="#")
+                  span.scroll__text Скролл
+                  +icon('scroll', 'scroll__img')
+        section.about
+          .container.about__container
+            .about__left
+              .user
+                .user__avatar
+                  .avatar
+                    +image('content/user.jpg', 'avatar__img')
+                .user__text
+                  .user__text-left
+                    .user__text-row Проживаю:
+                    .user__text-row Возраст:
+                    .user__text-row Родился:
+                  .user__text-right
+                      .user__text-row Орел
+                      .user__text-row 31 год
+                      .user__text-row 27 октября 1988                 
+            .about__right
+              .about__text Привет, меня зовут
+              h2.about__username.section-title Вадим Бекитко
+              p.about__desc 
+                | Я занимаюсь разработкой современных сайтов и приложений. 
+                br
+                | Мне нравится делать интересные и современные проекты.              
+              p.about__ps Этот сайт я сделал в рамках обучения в Школе онлайн образования Loftschool. Чуть позже я освежу в нем свой контент. А пока посмотрите, как тут все классно и красиво!
+      section.values
+        .triangles
+          svg.triangles__item.triangles__item--left(version="1.1" viewBox="0 0 180 12"  preserveAspectRatio="none")
+            polygon(points="0,0 0,12 180,12")
+          svg.triangles__item.triangles__item--right(version="1.1" viewBox="0 0 180 12"  preserveAspectRatio="none")
+            polygon(points="180,0 180,12 0,12")        
+        .container.values__container
+          .values__title 
+            h2.values__title-text Чем я могу быть полезен вам
+            .values__desc Этот сайт я сделал в рамках обучения в Школе онлайн образования Loftschool. Чуть позже я освежу в нем свой контент. А пока посмотрите, как тут все классно и красиво!
+          .values__content            
+            .user-skills            
+              ul.user-skills__list
+                li.user-skills__item
+                  .skills-row
+                    .skills-row__title Frontend 
+                    .skills-row__content
+                      -
+                        var frontend = [
+                          {name:"HTML5", value:25},
+                          {name:"CSS3", value:15},
+                          {name:"Javascript", value:75},
+                          {name:"Jquery и Vue.js", value:25}
+                        ];
+                      ul.skills
+                        each skill in frontend
+                          li.skills__item
+                            .skill
+                              .skill__title #{skill.name}
+                              svg.skill__circle(version="1.1" viewBox="0 0 150 150"  preserveAspectRatio="none")
+                                circle(cx="75" cy="75" r="65" stroke="#e9e9e9" stroke-width="10" fill='none')
+                                g(fill="none" stroke-width="20" stroke-dasharray=`${skill.value*4} ${(100-skill.value)*4}`)
+                                  circle(cx="75" cy="75" r="65" stroke="url(#linear-gradient)" stroke-dashoffset="200")
+                li.user-skills__item
+                  .skills-row
+                    .skills-row__title Workflow 
+                    .skills-row__content
+                      -
+                        var workflow = [
+                          {name:"GIT", value:15},
+                          {name:"Terminal", value:25},
+                          {name:"Gulp", value:50},
+                          {name:"Webpack", value:40}
+                        ];
+                      ul.skills
+                        each skill in workflow
+                          li.skills__item
+                            .skill
+                              .skill__title #{skill.name}
+                              svg.skill__circle(version="1.1" viewBox="0 0 150 150"  preserveAspectRatio="none")
+                                circle(cx="75" cy="75" r="65" stroke="#e9e9e9" stroke-width="10" fill='none')
+                                g(fill="none" stroke-width="20" stroke-dasharray=`${skill.value*4} ${(100-skill.value)*4}`)
+                                  circle(cx="75" cy="75" r="65" stroke="url(#linear-gradient)" stroke-dashoffset="200")
+      section.works
+        .container
+          .works__title.section-title Мои Работы
+          .works__content
+            .works__slider
+              .slider
+                .slider__display
+                  .slider__display-content
+                    .slider__display-image
+                      +image('content/work4.jpg', 'slider__display-pic')
+                    .slider__display-thumbs
+                      -var slides = ["work1", "work2", "work3", "work4", "work5"];
+                      ul.slider-thumbs
+                        each elem in slides
+                          if elem == "work4"
+                            li.slider-thumbs__item.slider-thumbs__item--is-active
+                              a.slider-thumbs__link(href="#")                            
+                                +image(`content/${elem}.jpg`, 'slider-thumbs__pic')
+                          else                        
+                            li.slider-thumbs__item
+                              a.slider-thumbs__link(href="#")                            
+                                +image(`content/${elem}.jpg`, 'slider-thumbs__pic')
+                  .slider__buttons
+                    button.direction-btn.direction-btn--next
+                      +icon('arrow-down', 'direction-btn__arrow')
+                    button.direction-btn.direction-btn--prev
+                      +icon('arrow-down', 'direction-btn__arrow direction-btn__arrow--is-active')
+                .slider__info
+                  .slider__tags
+                    ul.tags
+                      li.tags__item HTML
+                      li.tags__item CSS
+                      li.tags__item Javascript
+                  .slider__info-text
+                    h3.slider__info-subtitle Сайт школы образования
+                    p.slider__info-description Этот парень проходил обучение веб-разработке не где-то, а в Loftschool! 2&nbsp;месяца только самых тяжелых испытаний и бессонных ночей!
+                  .slider__info-links
+                    a.iconed-link(href="#")
+                      +icon('link', 'iconed-link__icon')
+                      span.iconed-link__text Посмотреть сайт
+      .bg-section        
+        section.reviews
+          .triangles
+            svg.triangles__item.triangles__item--left(version="1.1" viewBox="0 0 180 12"  preserveAspectRatio="none")
+              polygon(points="0,0 180,0 180,12")
+            svg.triangles__item.triangles__item--right(version="1.1" viewBox="0 0 180 12"  preserveAspectRatio="none")
+              polygon(points="180,0 0,12 0,0")
+          .container.reviews__container
+            .reviews__block
+              h2.reviews__title.section-title Что обо мне говорят
+              .reviews__nav
+                button.listing-btn.listing-btn--left
+                  +icon('arrow-down', 'listing-btn__pic')
+                button.listing-btn.listing-btn--right
+                  +icon('arrow-down', 'listing-btn__pic')
+            .reviews__content
+              ul.reviews__list
+                li.reviews__list-item.review
+                  .review__img-bg                      
+                  .review__content
+                    .review__text Этот парень проходил обучение веб-разработке не где-то, а в Loftschool! 4,5&nbsp;месяца только самых тяжелых испытаний и бессонных ночей!
+                    .person.review__person
+                      .person__avatar
+                        .avatar
+                          +image('content/review1.jpg', 'avatar__img')
+                      .person__info
+                        h4.person__name Ковальчук Дмитрий
+                        .person__post Основатель Loftschool
+                li.reviews__list-item.review
+                  .review__img-bg                      
+                  .review__content
+                    .review__text Этот код выдержит любые испытания. Только пожалуйста, не загружайте сайт на слишком старых браузерах
+                    .person.review__person
+                      .person__avatar
+                        .avatar
+                          +image('content/review2.jpg', 'avatar__img')
+                      .person__info
+                        h4.person__name Владимир Сабанцев
+                        .person__post Преподаватель
+                li.reviews__list-item.review
+                  .review__img-bg                      
+                  .review__content
+                    .review__text Этот код выдержит любые испытания. Только пожалуйста, не загружайте сайт на слишком старых браузерах
+                    .person.review__person
+                      .person__avatar
+                        .avatar
+                          +image('content/review2.jpg', 'avatar__img')
+                      .person__info
+                        h4.person__name Владимир Сабанцев 2
+                        .person__post Преподаватель
+                li.reviews__list-item.review
+                  .review__img-bg                      
+                  .review__content
+                    .review__text Этот код выдержит любые испытания. Только пожалуйста, не загружайте сайт на слишком старых браузерах
+                    .person.review__person
+                      .person__avatar
+                        .avatar
+                          +image('content/review2.jpg', 'avatar__img')
+                      .person__info
+                        h4.person__name Владимир Сабанцев 3
+                        .person__post Преподаватель
+        section.response
+          .container
+            h2.response__title.section-title Связаться со мной
+            .response__content
+              form.form.response__form
+                .form__row
+                  label.form__block
+                    .form__block-desc Введите ваше имя
+                    .form__block-row
+                      +icon('user', 'form__block-icon')
+                      input(name="name" type="text" placeholder="Ковальчук Дмитрий").form__input.form__entry
+                  label.form__block
+                    .form__block-desc Введите ваш email
+                    .form__block-row
+                      +icon('envelope', 'form__block-icon')
+                      input(name="email" type="text" placeholder="loftschool@study.com").form__input.form__entry
+                .form__row
+                  label.form__block
+                    .form__block-desc Сообщение к письму
+                    .form__block-row
+                      +icon('message', 'form__block-icon')
+                      textarea(name="textarea" type="text" placeholder="Требуется ваша помощь в создании сайта. Интересуют сроки и цена вопроса").form__entry.form__textarea
+                .form__btn
+                  button.send-button Отправить
+      footer.footer
+        .container.footer__container
+          .footer__info
+            .footer__year &copy;&nbsp;2020
+            .footer__author 
+              .footer__author-name Вадим Бекитко
+              .footer__info-desc 
+                | Личный сайт 
+                br
+                | веб-разработчика
+          .footer__content
+            .footer__menu
+              +menu("footer")
+            .footer__block
+              .footer__block-left
+                .footer__block-text Этот сайт я сделал в рамках обучения в Школе онлайн образования Loftschool
+                .footer__socials
+                  +socials("footer")
+              .footer__block-right
+                .footer__block-text Всегда пишите код так, будто сопровождать его будет склонный к насилию психопат, который знает где вы живете
+                .footer__block-author Martin Golding
+      svg(version="1.1").gradient          
+        linearGradient(id="linear-gradient")
+          stop(offset="0%" stop-color="#7b00ea")
+          stop(offset="50%" stop-color="#4a00ed")

@@ -1,0 +1,30 @@
+.user-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+
+  @include desktop {
+    flex-direction: row;
+    text-align: start;
+  }
+}
+
+.user-info__desc {
+  font-size: 18px;  
+  opacity: 0.7;
+  margin-right: 50px;
+  line-height: 1.7;
+  font-weight: 600;
+
+  @include desktop {
+    text-align: end;
+  }
+}
+
+.user-info__name {
+  font-size: 72px;
+  font-weight: 800;
+  max-width: 300px;
+  line-height: 0.9;
+}

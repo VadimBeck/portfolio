@@ -1,0 +1,20 @@
+.menu {  
+  & .menu__item {
+    &:hover {
+      color: $violet;
+    }
+  } 
+
+  &--footer {
+    & .menu__item {
+      &:hover {
+        color: $grey;
+      }
+    }    
+  }
+}
+
+.menu__list {
+  display: flex;
+  justify-content: space-between;
+}
