@@ -1,0 +1,27 @@
+.listing-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 1px solid $text-color;
+  color: $text-color;
+  margin-left: 30px;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  transition: .2s;
+
+  &:hover, &:active {
+    background: $violet;
+    color: #fff;
+  }
+
+  &--left .listing-btn__pic {
+    transform: rotate(180deg);
+  }
+}
+
+.listing-btn__pic {
+  width: 10px;
+  height: 10px;
+  fill: currentColor;
+}

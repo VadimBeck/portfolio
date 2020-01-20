@@ -1,0 +1,73 @@
+.footer {
+  background-color: $blue;
+  color: $grey;
+  padding: 70px 0;
+}
+
+.footer__container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.footer__info {
+  width: 30%;
+  display: flex;
+  justify-content: space-between;
+
+  @include desktop {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+}
+
+.footer__year {
+  font-size: 48px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  margin-right: 20px;
+}
+
+.footer__author-name {
+  color: #fff;
+  text-transform: uppercase;;
+  font-size: 20px;
+  font-weight: 700;
+  max-width: 100px;
+  margin-bottom: 15px;
+}
+
+.footer__info-desc {
+  font-weight: 600;
+}
+
+.footer__content {
+  width: 60%;
+}
+
+.footer__menu {
+  color: #fff;
+  margin-bottom: 50px;  
+}
+
+.footer__block {
+  display: flex;
+  justify-content: space-between;
+}
+
+.footer__block-left {
+  width: 30%;
+}
+
+.footer__block-right {
+  width: 60%;
+}
+
+.footer__block-author {
+  color: #fff;
+  font-style: italic;
+}
+
+.footer__block-text {
+  margin-bottom: 25px;
+  line-height: 1.7;
+}

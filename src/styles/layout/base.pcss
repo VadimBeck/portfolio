@@ -30,7 +30,11 @@ body {
   margin: 0 auto;
   max-width: 1480px;
   width: 95%;
-  // width: 1490px;
+  position: relative;
+  
+  @include desktop {
+    max-width: 1090px;
+  }
 
   @include phones {
     width: 85%;
@@ -40,6 +44,10 @@ body {
 .fullscreen-section {
   height: 100vh;
   min-height: 650px;
+}
+
+.gradient {
+  position: absolute;
 }
 
 button {
@@ -80,6 +88,7 @@ button[type="button"] {
 a {
   color: inherit;
   cursor: pointer;
+  text-decoration: none;
 }
 
 img {
