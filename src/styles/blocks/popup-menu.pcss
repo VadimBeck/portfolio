@@ -1,0 +1,24 @@
+.popup-menu {
+  position: absolute;
+  flex-direction: column;
+  justify-content: center;
+  display: none;
+  height: 100vh;
+  padding: 65px;
+  right: 0;
+  top: 0;
+  font-size: 18Px;
+  font-weight: 600;
+  width: 100%;
+  max-width: 320px;
+
+  &.is-active {
+    display: flex;        
+    background: #fff;
+  }
+
+  @include phones {
+    max-width: none;
+    width: 100%;
+  }
+}

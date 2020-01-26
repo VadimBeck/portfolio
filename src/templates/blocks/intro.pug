@@ -1,0 +1,30 @@
+section.intro
+  .container.intro__container
+    header.header.intro__header
+      .intro__logo
+        .logo ВБ
+      .intro__menu
+        +menu("header")
+      .intro__links
+        +socials("header")
+      .intro__menu-btn
+        button.menu-btn
+          span.menu-btn__inner
+    .intro__content
+      .user-info
+        .user-info__desc
+          | Личный сайт 
+          br
+          | веб разработчика
+        .user-info__name Вадим Бекитко
+    .intro__buttons
+      .scroll
+        a.scroll__link(href="#")
+          span.scroll__text Скролл
+          +icon('scroll', 'scroll__img')
+  .popup-menu
+    button.close-btn
+    .popup-menu__menu
+      +menu("popup-menu")
+    .popup-menu__socials
+      +socials("popup-menu")

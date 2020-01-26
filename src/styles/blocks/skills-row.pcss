@@ -1,5 +1,31 @@
+.skills-row__list {
+  display: flex;
+  @include phones {
+    flex-wrap: wrap;
+    margin-right: -15px;
+  }
+}
+
+.skills-row__item {
+  width: 155px;
+  margin-right: 30px;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  @include phones {
+    margin-right: 15px;
+    flex-basis: calc(100%/2-15px);
+  }
+}
+
 .skills-row__title {
   font-size: 24px;
   font-weight: 700;
   margin-bottom: 30px;
+
+  @include tablets {
+    text-align: center;
+  }
 }

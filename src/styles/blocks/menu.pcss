@@ -3,18 +3,52 @@
     &:hover {
       color: $violet;
     }
-  } 
+  }  
 
   &--footer {
     & .menu__item {
       &:hover {
         color: $grey;
+      }     
+    }
+    @include tablets {
+      & .menu__list {
+        flex-wrap: wrap;
+        justify-content: flex-start;
       }
-    }    
+      & .menu__item {
+        margin-bottom: 20px;
+        flex-basis: calc(100%/4-2px);        
+      }
+    } 
+
+    @include phones {
+      & .menu__item {
+        flex-basis: calc(100%/2-2px);        
+      }
+    } 
+  }
+
+  &--popup-menu {
+    margin-bottom: 40px;
+    & .menu__list {
+      flex-direction: column;
+    }
+    & .menu__item {
+      margin-bottom: 20px;
+    }
   }
 }
 
 .menu__list {
   display: flex;
   justify-content: space-between;
+}
+
+.menu__item {
+  margin-right: 2px;
+
+  &:last-child {
+    margin-right: 0;
+  }
 }

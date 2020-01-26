@@ -1,6 +1,10 @@
 .form__row {
   display: flex;
   margin-left: -80px;
+
+  @include phones {
+    flex-wrap: wrap;
+  }
 }
 
 .form__block {
@@ -13,6 +17,10 @@
   margin-bottom: 25px;
   margin-left: 35px;
   opacity: 0.5;
+
+  @include phones {
+    margin-left: 50px;
+  }
 }
 
 .form__block-row {
@@ -32,6 +40,10 @@
   margin-right: 15px;
   fill: currentColor;
   opacity: 0.5;
+
+  @include phones {
+    display: none;
+  }
 }
 
 .form__entry {
@@ -41,14 +53,29 @@
   background: transparent;
   outline: none;
   color: $text-color;
+
+  @include phones {
+    margin-left: 50px;
+  }
 }
 
-.form__textarea {  
+.form__textarea {
   max-width: 450px;
-  resize: none;
+  resize: none;  
   line-height: 1.7;
+
+  @include phones {
+    min-height: 120px;
+  }
 }
 
-.form__btn {
+.form__btn {  
   margin-top: 20px;
+  height: 80px;
+  width: 90%;
+  max-width: 340px;
+
+  @include tablets {
+    align-self: center;
+  }
 }

@@ -1,7 +1,17 @@
 .works {
-  margin-bottom: 150px;
+  margin-bottom: 100px;
+}
+
+.works__container {
+  @include phones {
+    width: 100%;
+  }
 }
 
 .works__title {
   margin-bottom: 60px;
+
+  @include phones {
+    text-align: center;
+  }
 }
