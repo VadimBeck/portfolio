@@ -8,23 +8,38 @@
     flex-direction: row;
     text-align: start;
   }
+
+  @include tablets {
+    flex-direction: column;
+    text-align: center;
+  }
 }
 
 .user-info__desc {
   font-size: 18px;  
-  opacity: 0.7;
-  margin-right: 50px;
+  opacity: 0.7;  
   line-height: 1.7;
   font-weight: 600;
+  margin-bottom: 15px;
 
   @include desktop {
     text-align: end;
+    margin-right: 50px;
+  }
+
+  @include tablets {
+    text-align: center;
+    margin-right: 0;
   }
 }
 
 .user-info__name {
   font-size: 72px;
   font-weight: 800;
-  max-width: 300px;
+  max-width: 350px;
   line-height: 0.9;
+
+  @include tablets {
+    font-size: 48px;
+  }
 }

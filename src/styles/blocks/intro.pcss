@@ -1,7 +1,12 @@
 .intro {
   height: 100vh;
-  min-height: 650px;  
+  min-height: 650px;
+  max-height: 950px;
   margin-bottom: 150px;
+
+  @include tablets {
+    margin-bottom: 0;    
+  }
 }
 
 .intro__container {
@@ -28,19 +33,52 @@
   font-weight: 800;
 }
 
+.intro__links {
+
+  @include tablets {
+    margin-left: auto;
+  }
+  
+  @include phones {
+    display: none;
+  }
+}
+
 .intro__menu {
-  margin: 0 90px;
-  flex: 1;
+  margin: 0 50px;
+  flex: 0.9;
+
+  @include tablets {
+    display: none;
+  }
+}
+
+.intro__menu-btn {
+  color: $text-color;
+  display: none;
+
+  @include tablets {
+    display: block;
+    margin-left: 90px;
+  }
 }
 
 .intro__content {
   grid-area: content;
   justify-self: center;
   align-self: center;
+
+  @include tablets {
+    margin-bottom: 150px;
+  }
 }
 
 .intro__buttons {
   grid-area: buttons;
   justify-self: center;
-  padding: 50px; 
+  padding: 50px;
+
+  @include tablets {
+    display: none;
+  }
 }

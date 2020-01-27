@@ -1,29 +1,41 @@
-.reviews {
-  overflow: hidden;
-}
-
 .reviews__container {
   margin-top: 130px;
   margin-bottom: 180px;
 }
 
+.reviews__slider {
+  max-width: 990px;
+}
+
 .reviews__block {
   display: flex;
   margin-bottom: 80px;
+
+  @include phones {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
-.reviews__nav {
-  margin-left: 50px;
+.reviews__title {
+  margin-right: 30px;
+  @include phones {
+    text-align: center;
+    margin-right: 0;
+    margin-bottom: 20px;
+  }
 }
 
-.reviews__list {
+.reviews__nav {  
   display: flex;
-  width: 80%;
-  overflow: hidden;
+  justify-content: space-between;
+  width: 130px;
 }
 
-.reviews__list-item {
-  width: 50%;
-  flex-shrink: 0;
-  padding-right: 40px;
+.reviews__item {
+  width: 50%; 
+  min-height: 220px;  
+  @include phones {
+    width: 100%;
+  }
 }

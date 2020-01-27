@@ -3,6 +3,7 @@
   height: 50px;
   background-color: $button-color;
   transition: .2s;
+  outline: none;
   
   &:hover, &:active {
     background-color: $violet;
@@ -14,12 +15,16 @@
   &--prev {
     transform: rotate(90deg);
   }
+
+  &.is-active {
+    .direction-btn__arrow {     
+        opacity: 1;    
+    }    
+  }
 }
 
 .direction-btn__arrow {
   height: 10px;
-  fill: $grey;
-  &--is-active {
-    fill: #fff;
-  }
+  fill: #fff;
+  opacity: 0.5;
 }

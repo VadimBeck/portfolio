@@ -4,7 +4,23 @@
 
 .skill__title {
   position: absolute;
+  text-align: center;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+}
+
+.skill__circle {
+  fill: transparent;
+
+  &--inner {
+    stroke-width: 10px;
+    stroke: #e9e9e9;
+  }
+
+  &--outer {
+    stroke-width: 20px;
+    stroke-dasharray: 408;
+    stroke-dashoffset: 260;
+  }
 }
