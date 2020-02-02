@@ -1,10 +1,12 @@
 script(type="text/x-template")#slider-container
   .works-slider
     display(
-      :works="cuttedWorks"
+      :works="works"
+      :displayedWorks="displayedWorks"
       :currentWork="currentWork"
       :currentIndex="currentIndex"      
       @slide="handleSlide"
+      @checkWork="checkActiveWork"
     )
     info(
       :currentWork="currentWork"
@@ -17,8 +19,9 @@ script(type="text/x-template")#slider-display
       .works-slider__display-image
         img(:src="currentWork.photo", alt="", class="works-slider__display-pic")
       thumbs(
-        :works="reversedWorks"
+        :displayedWorks="displayedWorks"
         :currentWork="currentWork"
+        @checkWork="$emit('checkWork', $event)"
       )
     buttons(
       :currentIndex="currentIndex"
@@ -30,8 +33,9 @@ script(type="text/x-template")#slider-display
 script(type="text/x-template")#slider-thumbs
   ul.works-slider__thumbs
     li.works-slider__thumbs-item(
-      v-for="work in works" 
+      v-for="(work, index) in displayedWorks" 
       :class="{'is-active': work.id === currentWork.id}"
+      @click.prevent="$emit('checkWork', index)"
     )
       a.works-slider__thumbs-link
         img(:src="work.photo", alt="", class="works-slider__thumbs-pic")

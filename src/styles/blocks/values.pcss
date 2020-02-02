@@ -1,20 +1,42 @@
 .values__container {
+  position: relative;
   margin: 170px auto 90px;
   display: flex;
   flex-direction: column;
-  background: url('../images/rucksack.png') left -20%  bottom / 55% no-repeat;
+
+  &::after {
+    content: '';
+    position: absolute;
+    background: url('../images/rucksack.png') center bottom / contain no-repeat;
+    width: 50%;
+    height: 80%;
+    max-height: 800px;
+    left: 0;
+    top: 180px;
+  }
 
   @include desktop {
-    background: url('../images/rucksack.png') left -45%  bottom / 60% no-repeat;
+    &::after {
+      left: -10%;
+      top: 100px;  
+    }
   }
 
   @include tablets {
     padding-bottom: 55%;
-    background: url('../images/rucksack.png') center  bottom / 60% no-repeat;
+    &::after {
+      width: 60%;
+      left: 50%;
+      top: auto;
+      bottom: 0;
+      transform: translate(-50%);
+    }
   }
-  
   @include phones {
-    background-size: 80%;
+    padding-bottom: 65%;
+    &::after {
+      width: 80%;
+    }
   }
 }
 
