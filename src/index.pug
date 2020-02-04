@@ -22,9 +22,14 @@ html(lang="en")
         include ./templates/blocks/reviews.pug            
         include ./templates/blocks/response.pug
       include ./templates/blocks/footer.pug
+      .modal#modal
+        .modal__inner
+          .modal__text
+          .modal__btn
+            button#modal__close.send-button Закрыть
       svg(version="1.1").gradient          
         linearGradient(id="gradient" x1="0%" y1="0%" x2="100%" y2="0%")
           stop(offset="0%" stop-color="#4a00ed")
-          stop(offset="100%" stop-color="#7d00ea")
+          stop(offset="100%" stop-color="#7b00ea")
     
       include ./templates/entry.pug

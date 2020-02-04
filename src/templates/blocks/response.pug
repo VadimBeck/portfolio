@@ -2,23 +2,27 @@ section.response
   .container           
     h2.response__title.section-title Связаться со мной
     .response__content
-      form.form.response__form
-        .form__row
-          label.form__block
-            .form__block-desc Введите ваше имя
-            .form__block-row
-              +icon('user', 'form__block-icon')
-              input(name="name" type="text" placeholder="Ковальчук Дмитрий").form__input.form__entry
-          label.form__block
-            .form__block-desc Введите ваш email
-            .form__block-row
-              +icon('envelope', 'form__block-icon')
-              input(name="email" type="text" placeholder="loftschool@study.com").form__input.form__entry
-        .form__row
-          label.form__block
-            .form__block-desc Сообщение к письму
-            .form__block-row
-              +icon('message', 'form__block-icon')
-              textarea(name="textarea" type="text" placeholder="Требуется ваша помощь в создании сайта. Интересуют сроки и цена вопроса").form__entry.form__textarea
-        .form__btn
-          button.send-button Отправить
+      .response__form
+        form.form#form
+          .form__row
+            label.form-block
+              .form-block__desc Введите ваше имя
+              .form-block__row
+                +icon('avatar', 'form-block__icon')
+                input(name="name" type="text" required  placeholder="Ковальчук Дмитрий").form-block__input.form-block__entry
+              .form-block__validate Заполните это поле
+            label.form-block
+              .form-block__desc Введите ваш email
+              .form-block__row
+                +icon('envelope', 'form-block__icon')
+                input(name="email" type="text" required  placeholder="loftschool@study.com").form-block__input.form-block__entry
+              .form-block__validate Заполните это поле
+          .form__row
+            label.form-block
+              .form-block__desc Сообщение к письму
+              .form-block__row
+                +icon('message', 'form-block__icon')
+                textarea(name="textarea" type="text" required  placeholder="Требуется ваша помощь в создании сайта. Интересуют сроки и цена вопроса").form-block__entry.form-block__textarea
+              .form-block__validate Заполните это поле
+          .form__btn
+            button.send-button#response-btn Отправить

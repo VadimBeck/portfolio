@@ -1,14 +1,14 @@
 .menu {  
   & .menu__item {
     &:hover {
-      color: $violet;
+      color: $blue-violet;
     }
   }  
 
   &--footer {
     & .menu__item {
       &:hover {
-        color: $grey;
+        color: $dark-grey;
       }     
     }
     @include tablets {
@@ -18,13 +18,13 @@
       }
       & .menu__item {
         margin-bottom: 20px;
-        flex-basis: calc(100%/4-2px);        
+        flex-basis: calc(100%/4);        
       }
     } 
 
     @include phones {
       & .menu__item {
-        flex-basis: calc(100%/2-2px);        
+        flex-basis: calc(100%/2);        
       }
     } 
   }
@@ -46,7 +46,7 @@
 }
 
 .menu__item {
-  margin-right: 2px;
+  padding-right: 2px;
 
   &:last-child {
     margin-right: 0;
