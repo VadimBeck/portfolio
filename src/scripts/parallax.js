@@ -18,9 +18,9 @@ function throttle(f, ms) {
 function moveLayers(wScroll) {
   layers.forEach(layer => {
     const divider = layer.dataset.speed;
-    const strafe = wScroll * divider / 20;    
+    const strafe = wScroll * divider / 20;
 
-    layer.style.transform = `translateY(-${strafe}%)`;
+    layer.style.transform = `translateY(-${strafe}%) translateZ(0)`;
   });
 }
 

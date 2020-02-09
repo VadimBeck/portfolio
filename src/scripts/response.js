@@ -21,8 +21,8 @@ const ajaxForm = function(form) {
     const promise = new Promise( function(resolve, reject) {
       const xhr = new XMLHttpRequest();
       xhr.responseType = 'json';
-      xhr.open('POST','https://webdev-api.loftschool.com/sendmai');
-       xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+      xhr.open('POST','https://webdev-api.loftschool.com/sendmail');
+      xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
       xhr.send(data);
       xhr.addEventListener('load', () => {
         if (xhr.status >= 400) {
