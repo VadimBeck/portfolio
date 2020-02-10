@@ -1,0 +1,274 @@
+<template lang="pug">
+  .edit-block.reviews__edit
+    h3.edit-block__subtitle Новый отзыв
+    form.redact-form(@submit.prevent="addNewReview")
+      .review-edit
+        .review-edit__image
+          .avatar-load
+            .avatar-load__image
+            label.avatar-load__field
+              .avatar-load__desc Добавить фото
+              input.avatar-load__file(type="file" @change="loadFile($event)")
+        .review-edit__form            
+          label.redact-form__row
+            .redact-form__block(data-title="Имя автора")
+              input.redact-form__entry.input(type="text" v-model="newReview.author")
+            .redact-form__block(data-title="Титул автора")
+              input.redact-form__entry.input(type="text" v-model="newReview.occ")
+          label.redact-form__row
+            .redact-form__block.redact-form__block--no-border(data-title="Отзыв")
+              textarea.redact-form__entry.textarea(name="textarea" type="text" v-model="newReview.text")
+          .redact-form__buttons
+            button.cancel-btn(@click.prevent="cancellAddMode") Отмена
+            button.action-btn(type="submit") Сохранить
+</template>
+
+<script>
+import { mapActions, mapState } from "vuex";
+
+export default {
+  data() {
+    return {
+      newReview: {
+        author: "",
+        occ: "",
+        text: ""
+      },
+      formData: null
+    };
+  },
+  methods: {
+    ...mapActions("reviews", ["addReview"]),
+    loadFile(event) {
+      this.formData.append("photo", event.target.files[0]);
+    },
+    createReview() {
+      this.formData.append("author", this.newReview.author);
+      this.formData.append("occ", this.newReview.occ);
+      this.formData.append("text", this.newReview.text);
+    },
+    async addNewReview() {
+      try {
+        this.createReview();
+        await this.addReview(this.formData);
+        this.cancellAddMode();
+      } catch (error) {
+        alert(error.message);
+      }
+    },
+    cancellAddMode() {
+      this.$emit("cancellAddMode");
+    }
+  },
+  created() {
+    this.formData = new FormData();
+  }
+};
+</script>
+
+<style lang="postcss" scoped>
+@import "../../styles/mixins.pcss";
+
+.redact-form {
+  position: relative;
+
+  @include tablets {
+    padding-bottom: 60px;
+  }
+}
+
+.redact-form__row {
+  display: flex;
+  margin-left: -30px;
+
+  @include phones {
+    flex-direction: column;
+  }
+}
+
+.redact-form__block {
+  position: relative;
+  margin-left: 30px;
+  margin-bottom: 20px;
+  flex: 1;
+  padding-bottom: 10px;
+  color: #414c63;
+  border-bottom: 1px solid #414c63;
+
+  &:before {
+    content: attr(data-title);
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    opacity: 0.5;
+  }
+
+  &--no-border {
+    border: none;
+    padding-bottom: 0;
+  }
+
+  &.error {
+    border-color: $red;
+
+    & .textarea {
+      border-color: $red;
+    }
+
+    & .block-validate {
+      display: block;
+    }
+  }
+}
+
+.redact-form__entry {
+  font-weight: 600;
+  width: 100%;
+  font-size: inherit;
+  color: inherit;
+  outline: none;
+}
+
+.redact-form__buttons {
+  display: flex;
+  justify-content: flex-end;
+
+  @include tablets {
+    position: absolute;
+    padding-right: 20px;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+.textarea {
+  font-family: inherit;
+  padding: 15px;
+  line-height: 1.6;
+  resize: none;
+  min-height: 150px;
+  font-size: 16px;
+  background: none;
+  border: 1px solid #d9dbe0;
+
+  @include phones {
+    min-height: 200px;
+  }
+}
+
+.edit-block {
+  background: #fff;
+  padding: 30px 20px;
+  margin-bottom: 30px;
+  box-shadow: 4px 2px 20px 0px rgba(#000, 0.1);
+
+  @include phones {
+    padding: 20px 0;
+  }
+}
+
+.edit-block__subtitle {
+  padding: 0 20px 25px;
+  border-bottom: 1px solid $grey;
+  margin-bottom: 45px;
+  font-size: 18px;
+}
+
+.review-edit {
+  display: flex;
+  padding: 0 10px;
+  margin-bottom: 30px;
+
+  @include phones {
+    flex-direction: column;
+    align-items: center;
+  }
+  @include phones {
+    padding: 0 20px;
+  }
+}
+
+.review-edit__image {
+  margin-right: 30px;
+
+  @include phones {
+    margin-right: 0;
+    margin-bottom: 35px;
+  }
+}
+
+.avatar-load {
+  position: relative;
+  border: 1px solid transparent;
+
+  &.error {
+    border: 1px solid $red;
+    & .block-validate {
+      display: block;
+    }
+  }
+}
+
+.avatar-load__file {
+  display: none;
+}
+
+.avatar-load__image {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background-color: #dee4ed;
+  margin-bottom: 20px;
+  background: svg-load("user.svg", fill= "#fff") center center / 50% 50%
+      no-repeat,
+    #dee4ed;
+}
+
+.avatar-load__link {
+  display: block;
+  text-decoration: none;
+}
+
+.avatar-load__desc {
+  text-align: center;
+  font-weight: 600;
+  color: #383bcf;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.review-edit__form {
+  flex: 1;
+  max-width: 630px;
+
+  @include phones {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.action-btn {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  background: linear-gradient(to right, $light-blue, $blue);
+  padding: 15px 30px;
+  border-radius: 30px;
+}
+
+.cancel-btn {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  color: $blue;
+  font-weight: 700;
+  font-size: 16px;
+  background: transparent;
+  padding: 15px;
+  margin-right: 30px;
+}
+</style>
