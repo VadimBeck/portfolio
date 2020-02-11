@@ -22,6 +22,7 @@
                 :review="review"
                 @enableEditMode="enableEditMode"
               )
+    tooltip
 </template>
 
 <script>
@@ -31,7 +32,8 @@ export default {
   components: { 
     reviewItem: () => import('../reviewItem'), 
     reviewAddForm: () => import('../reviewAddForm'),
-    reviewEditForm: () => import('../reviewEditForm')
+    reviewEditForm: () => import('../reviewEditForm'),
+    tooltip: () => import("../tooltip")
   },
   data() {
     return {
@@ -65,6 +67,12 @@ export default {
 
 <style lang="postcss" scoped>
 @import "../../../styles/mixins.pcss";
+
+  .review {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
 
   .content-list {
     display: flex;

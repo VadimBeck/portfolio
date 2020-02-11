@@ -1,5 +1,5 @@
-const parallax = document.querySelector('.parallax');
-const layers = [...document.querySelectorAll('.parallax__layer')];
+const parallax = document.querySelector(".parallax");
+const layers = [...document.querySelectorAll(".parallax__layer")];
 
 function throttle(f, ms) {
   let isThrottled = false;
@@ -10,15 +10,14 @@ function throttle(f, ms) {
     f.apply(this, arguments);
     isThrottled = true;
 
-    setTimeout(() => isThrottled = false, ms);
+    setTimeout(() => (isThrottled = false), ms);
   };
-
 }
 
 function moveLayers(wScroll) {
   layers.forEach(layer => {
     const divider = layer.dataset.speed;
-    const strafe = wScroll * divider / 20;
+    const strafe = (wScroll * divider) / 20;
 
     layer.style.transform = `translateY(-${strafe}%) translateZ(0)`;
   });
@@ -26,7 +25,7 @@ function moveLayers(wScroll) {
 
 let trottledMoveLayers = throttle(moveLayers, 5);
 
-window.addEventListener("scroll", e=> {
+window.addEventListener("scroll", e => {
   const wScroll = window.pageYOffset;
   trottledMoveLayers(wScroll);
 });

@@ -39,6 +39,7 @@ export default {
   },
   methods: {
     ...mapActions("reviews", ["addReview"]),
+    ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
       this.formData.append("photo", event.target.files[0]);
     },
@@ -51,9 +52,10 @@ export default {
       try {
         this.createReview();
         await this.addReview(this.formData);
+        this.showTooltip({ success: "Отзыв добавлен" });
         this.cancellAddMode();
       } catch (error) {
-        alert(error.message);
+        this.showTooltip({ error: error.message });
       }
     },
     cancellAddMode() {

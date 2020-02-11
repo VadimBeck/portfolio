@@ -1,103 +1,100 @@
-const body = document.querySelector('body');
-const responseButton = document.querySelector('#response-btn');
-const modal = document.querySelector('#modal');
+const body = document.querySelector("body");
+const responseButton = document.querySelector("#response-btn");
+const modal = document.querySelector("#modal");
 
-responseButton.addEventListener('click', e=>{
+responseButton.addEventListener("click", e => {
   e.preventDefault();
 
-  if(validateForm(form)) {
+  if (validateForm(form)) {
     submitForm();
   }
-  
 });
 
 const ajaxForm = function(form) {
- 
   let data = new FormData();
-    data.append("name", form.elements.name.value);
-    data.append("email", form.elements.email.value);
-    data.append("comment", form.elements.textarea.value);
+  data.append("name", form.elements.name.value);
+  data.append("email", form.elements.email.value);
+  data.append("comment", form.elements.textarea.value);
 
-    const promise = new Promise( function(resolve, reject) {
-      const xhr = new XMLHttpRequest();
-      xhr.responseType = 'json';
-      xhr.open('POST','https://webdev-api.loftschool.com/sendmail');
-      xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-      xhr.send(data);
-      xhr.addEventListener('load', () => {
-        if (xhr.status >= 400) {
-          reject(xhr.status);          
-        } else {
-          resolve(xhr.status);
-        }
-      })
+  const promise = new Promise(function(resolve, reject) {
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = "json";
+    xhr.open("POST", "https://webdev-api.loftschool.com/sendmail");
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    xhr.send(data);
+    xhr.addEventListener("load", () => {
+      if (xhr.status >= 400) {
+        reject(xhr.status);
+      } else {
+        resolve(xhr.status);
+      }
     });
-    
-    return promise;  
+  });
+
+  return promise;
 };
 
-const submitForm = function() {  
-  const form = document.querySelector('#form');
-    
-  ajaxForm(form).then(
-      () => openOverlay('Сообщение отправлено'),      
-    ).catch (
-      (error) => openOverlay('Ошибка соединения с сервером, попробуйте позже', 'error')
-    )
+const submitForm = function() {
+  const form = document.querySelector("#form");
+
+  ajaxForm(form)
+    .then(() => openOverlay("Сообщение отправлено"))
+    .catch(error =>
+      openOverlay("Ошибка соединения с сервером, попробуйте позже", "error")
+    );
 };
 
 function validateForm(form) {
   let valid = true;
 
-  if(!validateField(form.elements.name)) {
+  if (!validateField(form.elements.name)) {
     valid = false;
   }
-  if(!validateField(form.elements.email)) {
+  if (!validateField(form.elements.email)) {
     valid = false;
   }
-  if(!validateField(form.elements.textarea)) {
+  if (!validateField(form.elements.textarea)) {
     valid = false;
   }
 
   return valid;
 }
 
-function validateField(field) {  
+function validateField(field) {
   if (!field.checkValidity()) {
-    field.placeholder="";
-    field.parentNode.classList.add('error');    
+    field.placeholder = "";
+    field.parentNode.classList.add("error");
   } else {
-    field.parentNode.classList.remove('error');    
+    field.parentNode.classList.remove("error");
   }
   return field.checkValidity();
 }
 
 function openOverlay(status, errorClass) {
-  let modalText = modal.querySelector('.modal__text');
-  let closeButton = modal.querySelector('#modal__close');
+  let modalText = modal.querySelector(".modal__text");
+  let closeButton = modal.querySelector("#modal__close");
   modalText.textContent = status;
 
-  if(errorClass) {
+  if (errorClass) {
     modalText.classList.add(errorClass);
   } else {
     modalText.classList.remove(errorClass);
   }
 
-  closeButton.addEventListener('click', e=> {
+  closeButton.addEventListener("click", e => {
     e.preventDefault();
     closeOverlay();
   });
 
-  document.addEventListener('keydown', (e) => {
-    if (e.keyCode === 27) 
-    closeOverlay();
+  document.addEventListener("keydown", e => {
+    if (e.keyCode === 27) closeOverlay();
   });
 
-  body.classList.add('locked');
-  modal.classList.add('is-active');
-};
+  body.classList.add("locked");
+  modal.classList.add("is-active");
+}
 
 function closeOverlay() {
-  body.classList.remove('locked');
-  modal.classList.remove('is-active');
-};
+  body.classList.remove("locked");
+  modal.classList.remove("is-active");
+}

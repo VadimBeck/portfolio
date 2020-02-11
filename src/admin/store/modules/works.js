@@ -8,14 +8,20 @@ export default {
     SET_WORKS: (state, data) => (state.works = data),
     SET_CURRENT: (state, work) => (state.currentWork = work),
     ADD_WORK: (state, work) => state.works.push(work),
-    EDIT_WORK: (state, editedWork) =>
+    EDIT_WORK: (state, editedWork) => {
       state.works.map(work => {
-        if (work.id === editedWork.id) work = editedWork;
-      }),
-    REMOVE_WORK: (state, deletedWork) =>
-      state.works.filter(work => {
-        work.id !== deletedWork.id;
+        if(work.id === editedWork.id) {
+          for(let key in work) {
+            work[key] = editedWork[key];
+          }
+        }                       
       })
+    },
+    REMOVE_WORK: (state, deletedWork) => {
+      state.works = state.works.filter(
+        work => work.id != deletedWork.id
+      )
+    }
   },
   actions: {
     async fetchWorks({ commit }) {
@@ -23,9 +29,7 @@ export default {
         const { data } = await this.$axios.get("/works/253");
         commit("SET_WORKS", data);
       } catch (error) {
-        throw new Error(
-          error.response.data.error || error.response.data.message
-        );
+        errorHandler(error);
       }
     },
     async addWork({ commit }, newWork) {
@@ -33,9 +37,7 @@ export default {
         const { data } = await this.$axios.post("/works", newWork);
         commit("ADD_WORK", data);
       } catch (error) {
-        throw new Error(
-          error.response.data.error || error.response.data.message
-        );
+        errorHandler(error);
       }
     },
     async editWork({ commit }, editedWork) {
@@ -43,12 +45,10 @@ export default {
         const { data } = await this.$axios.post(
           `/works/${editedWork.id}`,
           editedWork.data
-        );
-        commit("EDIT_WORK", data);
+        );      
+        commit("EDIT_WORK", data.work);
       } catch (error) {
-        throw new Error(
-          error.response.data.error || error.response.data.message
-        );
+        errorHandler(error);
       }
     },
     async removeWork({ commit }, deletedWork) {
@@ -56,9 +56,7 @@ export default {
         await this.$axios.delete(`/works/${deletedWork.id}`);
         commit("REMOVE_WORK", deletedWork);
       } catch (error) {
-        throw new Error(
-          error.response.data.error || error.response.data.message
-        );
+        errorHandler(error);
       }
     },
     changeCurrentWork({ commit }, work) {

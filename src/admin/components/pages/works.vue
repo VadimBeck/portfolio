@@ -22,6 +22,7 @@
               :work="work"
               @enableEditMode="enableEditMode"
             )
+    tooltip
 </template>
 
 <script> 
@@ -31,7 +32,8 @@ export default {
   components: { 
     workAddForm: () => import('../workAddForm'),
     workEditForm: () => import('../workEditForm'), 
-    workItem: () => import('../workItem')
+    workItem: () => import('../workItem'),
+    tooltip: () => import("../tooltip")
   },
   data() {
     return {

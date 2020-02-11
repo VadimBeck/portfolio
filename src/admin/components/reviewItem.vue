@@ -31,7 +31,8 @@ export default {
     };
   },
   methods: {
-    ...mapActions("reviews", ["changeCurrentReview", "removeReview"]),
+    ...mapActions("reviews", ["changeCurrentReview", "removeReview"]),    
+    ...mapActions("tooltip", ["showTooltip"]),
     editCurrentReview() {
       this.changeCurrentReview(this.review);
       this.$emit("enableEditMode");
@@ -40,9 +41,10 @@ export default {
       try {
         if (confirm("удалить отзыв?")) {
           await this.removeReview(this.currentReview);
+          this.showTooltip({ success: "Отзыв удален" });
         }
       } catch (error) {
-        alert(error.message);
+        this.showTooltip({ error: error.message });
       }
     }
   }
@@ -51,7 +53,10 @@ export default {
 
 <style lang="postcss" scoped>
 .content-list__info {
-  padding: 30px 25px 25px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px 15px 25px 25px;
 }
 
 .content-list__subtitle {
@@ -70,7 +75,8 @@ export default {
 .content-list__btns {
   display: flex;
   justify-content: space-between;
-  margin-top: 35px;
+  margin-top: auto;
+  padding-top: 15px;
 }
 
 .edit-link {

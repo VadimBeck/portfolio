@@ -58,7 +58,8 @@ export default {
     }
   },
   methods: {
-    ...mapActions("works", ["editWork"]),
+    ...mapActions("works", ["editWork"]),    
+    ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
       this.changePhoto = true;
       this.formData.append("photo", event.target.files[0]);
@@ -71,9 +72,10 @@ export default {
         } else {
           await this.editWork({ data: this.work, id: this.work.id });
         }
+        this.showTooltip({ success: "Изменения внесены" });
         this.cancellEditMode();
       } catch (error) {
-        alert(error.message);
+        this.showTooltip({ error: error.message });
       }
     },
     createWork() {

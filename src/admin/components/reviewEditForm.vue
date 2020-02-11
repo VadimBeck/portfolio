@@ -12,12 +12,12 @@
         .review-edit__form            
           label.redact-form__row
             .redact-form__block(data-title="Имя автора")
-              input.redact-form__entry.input(type="text" v-model="currentReview.author")
+              input.redact-form__entry.input(type="text" v-model="review.author")
             .redact-form__block(data-title="Титул автора")
-              input.redact-form__entry.input(type="text" v-model="currentReview.occ")
+              input.redact-form__entry.input(type="text" v-model="review.occ")
           label.redact-form__row
             .redact-form__block.redact-form__block--no-border(data-title="Отзыв")
-              textarea.redact-form__entry.textarea(name="textarea" type="text" v-model="currentReview.text")              
+              textarea.redact-form__entry.textarea(name="textarea" type="text" v-model="review.text")              
           .redact-form__buttons
             button.cancel-btn(@click.prevent="cancellEditMode") Отмена
             button.action-btn(type="submit") Сохранить
@@ -43,6 +43,7 @@ export default {
   },
   methods: {
     ...mapActions("reviews", ["editReview"]),
+    ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
       this.changePhoto = true;
       this.formData.append("photo", event.target.files[0]);
@@ -55,9 +56,10 @@ export default {
         } else {
           await this.editReview({ data: this.review, id: this.review.id });
         }
+        this.showTooltip({ success: "Изменения внесены" });
         this.cancellEditMode();
       } catch (error) {
-        alert(error.message);
+        this.showTooltip({ error: error.message });
       }
     },
     createReview() {

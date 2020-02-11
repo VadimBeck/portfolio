@@ -56,6 +56,7 @@ export default {
   },
   methods: {
     ...mapActions("works", ["addWork"]),
+    ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
       this.formData.append("photo", event.target.files[0]);
     },
@@ -69,9 +70,10 @@ export default {
       try {
         this.createWork();
         await this.addWork(this.formData);
+        this.showTooltip({ success: "Работа добавлена" });
         this.cancellAddMode();
       } catch (error) {
-        alert(error.message);
+        this.showTooltip({ error: error.message });
       }
     },
     cancellAddMode() {

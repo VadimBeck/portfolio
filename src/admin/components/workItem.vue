@@ -29,6 +29,7 @@ export default {
   },
   methods: {
     ...mapActions("works", ["changeCurrentWork", "removeWork"]),
+    ...mapActions("tooltip", ["showTooltip"]),
     editCurrentWork() {
       this.changeCurrentWork(this.work);
       this.$emit("enableEditMode");
@@ -37,9 +38,10 @@ export default {
       try {
         if (confirm("удалить работу?")) {
           await this.removeWork(this.currentWork);
+          this.showTooltip({ success: "Работа удалена" });
         }
       } catch (error) {
-        alert(error.message);
+        this.showTooltip({ error: error.message });
       }
     }
   }

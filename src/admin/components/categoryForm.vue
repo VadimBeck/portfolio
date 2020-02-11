@@ -29,13 +29,15 @@ export default {
   },
   methods: {
     ...mapActions("categories", ["addCategory"]),
+    ...mapActions("tooltip", ["showTooltip"]),
     async addNewCategory() {
       try {
         await this.addCategory(this.title);
         this.title = "";
+        this.showTooltip({ success: "Категория добавлена" });
         this.cancelAddCategory();
       } catch (error) {
-        alert(error.message);
+        this.showTooltip({ error: error.message });
       }
     },
     cancelAddCategory() {

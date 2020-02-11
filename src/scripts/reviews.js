@@ -1,10 +1,10 @@
 import Vue from "vue";
-import Flickity from 'vue-flickity';
+import Flickity from "vue-flickity";
 
 new Vue({
   el: "#reviews-component",
   template: "#reviews-container",
-  components: {Flickity},
+  components: { Flickity },
   data() {
     return {
       flickityOptions: {
@@ -18,33 +18,33 @@ new Vue({
         contain: true
       },
       reviews: []
-    }
+    };
   },
-  
+
   methods: {
     next() {
       this.$refs.flickity.next();
-      this.checkBtns();     
+      this.checkBtns();
     },
-    
+
     previous() {
       this.$refs.flickity.previous();
       this.checkBtns();
     },
     checkBtns() {
-      const prevBtn = this.$el.querySelector('.listing-btn--prev');
-      const nextBtn = this.$el.querySelector('.listing-btn--next');
+      const prevBtn = this.$el.querySelector(".listing-btn--prev");
+      const nextBtn = this.$el.querySelector(".listing-btn--next");
       let index = this.$refs.flickity.selectedIndex();
-  
-      if(index == 0) {
+
+      if (index == 0) {
         prevBtn.disabled = true;
       } else if (index == this.$refs.flickity.slides().length - 1) {
         nextBtn.disabled = true;
-      } 
-      if (index > 0) {       
-        prevBtn.disabled = false;        
-      } else if (index < this.$refs.flickity.slides().length - 1) {       
-        nextBtn.disabled = false;        
+      }
+      if (index > 0) {
+        prevBtn.disabled = false;
+      } else if (index < this.$refs.flickity.slides().length - 1) {
+        nextBtn.disabled = false;
       }
     },
     makeArrayWithRequiredPics(data) {
@@ -53,11 +53,11 @@ new Vue({
         item.photo = requiredPic;
 
         return item;
-      })
+      });
     }
   },
   created() {
     const data = require("../data/reviews.json");
     this.reviews = this.makeArrayWithRequiredPics(data);
   }
-})
+});
