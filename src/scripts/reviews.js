@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Flickity from "vue-flickity";
+import axios from "axios";
 
 new Vue({
   el: "#reviews-component",
@@ -47,17 +48,24 @@ new Vue({
         nextBtn.disabled = false;
       }
     },
-    makeArrayWithRequiredPics(data) {
-      return data.map(item => {
-        const requiredPic = require(`../images/content/${item.photo}`);
-        item.photo = requiredPic;
+    // makeArrayWithRequiredPics(data) {
+    //   return data.map(item => {
+    //     const requiredPic = require(`../images/content/${item.photo}`);
+    //     item.photo = requiredPic;
 
-        return item;
-      });
-    }
+    //     return item;
+    //   });
+    // }
+    fetchReviews() {
+      axios
+        .get("https://webdev-api.loftschool.com/reviews/253")
+        .then(response => {
+          this.reviews = response.data;
+          this.$nextTick(function () { this.$refs.flickity.rerender() });   
+        });
+    },
   },
   created() {
-    const data = require("../data/reviews.json");
-    this.reviews = this.makeArrayWithRequiredPics(data);
+    this.fetchReviews();
   }
 });

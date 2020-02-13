@@ -3,37 +3,58 @@
     .login__inner
       form.login__form(@submit.prevent = "login")
         h2.login__title Авторизация
-        label.login__field(data-title='Логин')
+        label.login__field(data-title='Логин' :class="{error: validation.hasError('user.name')}")
           .login__block
-            input.login__input(type="text" v-model="user.name")
-          .block-validate.login__validate Введите имя пользователя
-        label.login__field(data-title='Пароль')
+            input.login__input(type="text" v-model="user.name" @input="checkField('user.name')")
+          .validate {{validation.firstError('user.name')}}
+        label.login__field(data-title='Пароль' :class="{error: validation.hasError('user.password')}")
           .login__block
-            input.login__input(type="password" v-model="user.password")
-          .block-validate.login__validate Введите пароль
+            input.login__input(type="password" v-model="user.password" @input="checkField('user.password')")
+          .validate {{validation.firstError('user.password')}}
         .login__btn
-          button.send-button(type="submit") Отправить
-    .login__warning
-      .login__warning-text  Неверное имя или пароль
-      .login__warning-close  
+          button.send-button(type="submit" :disabled="isSubmitBlocked") Отправить
+    tooltip
 </template>
 
 <script>
 import $axios from "../../requests";
+import { mapActions } from "vuex";
+import { Validator } from "simple-vue-validator";
 
 export default {
+  mixins: [require("simple-vue-validator").mixin],
+  validators: {
+    "user.name"(value) {
+      return Validator.value(value).required("Введите имя пользователя");
+    },
+    "user.password"(value) {
+      return Validator.value(value).required("Введите пароль")
+    }
+  },
+  components: { 
+    tooltip: () => import("../tooltip")
+  },
   data() {
     return {
       user: {
         name: "",
         password: ""
-      }
+      },
+      loading: false
     };
   },
-  props: [],
+  computed: {
+    isSubmitBlocked() {
+      return this.validation.hasError() || this.loading;
+    }
+  },
   methods: {
+    ...mapActions("tooltip", ["showTooltip"]),
     async login() {
       try {
+        let valid = await this.$validate();
+        if (!valid) return;
+        this.loading = true;
         const response = await $axios.post("/login", this.user);
         const token = response.data.token;
 
@@ -41,15 +62,24 @@ export default {
         $axios.defaults.headers["Authorization"] = `Bearer ${token}`;
 
         this.$router.replace("/");
-      } catch (error) {}
+      } catch (error) {
+        this.showTooltip({ error: 'Неверное имя или пароль' });
+      } finally {
+        this.loading = false;
+      }
+    },
+    async checkField(field) {
+      await this.$validate(field);
     }
   }
 };
 </script>
 
 <style lang="postcss" scoped>
+@import "../../../styles/mixins.pcss";
+
 .login {
-  position: fixed;
+  position: fixed;  
   left: 0;
   top: 0;
   right: 0;
@@ -79,11 +109,21 @@ export default {
 
 .login__inner {
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
   z-index: 2;
   padding: 50px;
   background-color: #fff;
   width: 80%;
   max-width: 400px;
+
+  @include phones {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+  }
 }
 
 .login__title {
@@ -112,14 +152,16 @@ export default {
 
   &.error {
     border-color: $red;
-    & .login__validate {
+
+    & .validate {
       display: block;
     }
-  }
-}
 
-.login__validate {
-  display: none;
+    & .login__block::before {
+    content: svg-load('avatar.svg', fill='$red', width=100%, height=100%);
+    }
+  }
+  
 }
 
 .login__block {
@@ -131,7 +173,6 @@ export default {
     position: absolute;
     width: 25px;
     height: 25px;
-    fill: red;
     left: -40px;
     top: -5px;
   }
@@ -165,33 +206,34 @@ export default {
   font-size: 18px;
   font-weight: 700;
 
-  &:active {
-    filter: grayscale(50%);
+  &:disabled {
+    filter: grayscale(90%);
+    opacity: 0.8;
+    pointer-events: none;
   }
 }
 
-.login__warning {
+.validate {
   position: absolute;
-  display: flex;
-  align-items: center;
-  bottom: 0;
-  padding: 15px 20px;
-  font-size: 15px;
-  opacity: 0.9;
   color: #fff;
   background-color: $red;
+  left: 40px;
+  font-size: 14px;
+  padding: 8px 12px;
+  bottom: 0;
   transform: translateY(100%);
-  transition: transform 0.5s;
+  display: none;
 
-  &.active {
-    transform: translateY(0%);
+  &::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: $red;
+    top: -5px;
+    left: 50%;
+    transform: translate(-50%) rotate(45deg);
   }
 }
 
-.login__warning-close {
-  width: 15px;
-  height: 15px;
-  margin-left: 20px;
-  //background: svg-load('cross.svg', fill='#fff', width=100%, height=100%);
-}
 </style>

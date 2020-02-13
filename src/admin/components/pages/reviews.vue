@@ -3,24 +3,21 @@
     .container
       h2.section-title.works__title Блок «Отзывы»
       review-add-form(
-        v-if="addReviewMode"
-        @cancellAddMode = "cancellAddMode"
+        v-if="addMode"
       )
       review-edit-form(
-        v-if="editReviewMode"
-        :currentReview="currentReview"
-        @cancellEditMode="cancellEditMode"      
+        v-if="editMode"
+        :currentReview="currentReview"     
       )
       .reviews-content
         ul.content-list
-          li.content-list__item
+          li.content-list__item(v-if="!addMode")
             .append
-              button.append__button(@click="addReviewMode = true")
+              button.append__button(@click="enableAddMode")
               .append__text Добавить отзыв          
             li.content-list__item(v-for="review in reviews")
               review-item(
                 :review="review"
-                @enableEditMode="enableEditMode"
               )
     tooltip
 </template>
@@ -35,28 +32,18 @@ export default {
     reviewEditForm: () => import('../reviewEditForm'),
     tooltip: () => import("../tooltip")
   },
-  data() {
-    return {
-      addReviewMode: false,
-      editReviewMode: false
-    }
-  },
   computed: {
     ...mapState("reviews", {
       reviews: state => state.reviews,
-      currentReview: state => state.currentReview
+      currentReview: state => state.currentReview,
+      addMode: state => state.addMode,
+      editMode: state => state.editMode
     })
   },
   methods: {
-    ...mapActions("reviews", ["fetchReviews"]),
-    cancellAddMode() {
-      this.addReviewMode = false;
-    },
-    cancellEditMode() {
-      this.editReviewMode = false;
-    },
-    enableEditMode() {
-      this.editReviewMode = true;
+    ...mapActions("reviews", ["fetchReviews", "changeAddMode"]),
+    enableAddMode() {
+      this.changeAddMode(true);
     }
   },
   created() {

@@ -9,15 +9,15 @@ script(type="text/x-template")#reviews-container
           +icon('arrow-down', 'listing-btn__pic')
     .reviews__slider
       flickity(ref="flickity" :options="flickityOptions")
-        .reviews__item(v-for="review in reviews")
+        .reviews__item(v-for="review in reviews" :key="review.id")
           .review
             .review__img-bg                      
             .review__content
-              .review__text {{review.review}}
+              .review__text {{review.text}}
               .person.review__person
                 .person__avatar
                   .avatar
-                    img(:src="review.photo", alt="", class="avatar__img")
+                    //- img(:src="review.photo", alt="", class="avatar__img")
                 .person__info
-                  h4.person__name {{review.name}}
-                  .person__post {{review.post}}
+                  h4.person__name {{review.author}}
+                  .person__post {{review.occ}}

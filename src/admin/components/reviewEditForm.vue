@@ -11,13 +11,37 @@
               input.avatar-load__file(type="file")
         .review-edit__form            
           label.redact-form__row
-            .redact-form__block(data-title="Имя автора")
-              input.redact-form__entry.input(type="text" v-model="review.author")
-            .redact-form__block(data-title="Титул автора")
-              input.redact-form__entry.input(type="text" v-model="review.occ")
+            .redact-form__block(
+              data-title="Имя автора"
+              :class="{error: validation.hasError('review.author')}"
+            )
+              input.redact-form__entry.input(
+                type="text" 
+                v-model="review.author"
+                @input="checkField('review.author')"
+              )
+              div.validate {{validation.firstError('review.author')}}
+            .redact-form__block(
+              data-title="Титул автора"
+              :class="{error: validation.hasError('review.occ')}"
+            )
+              input.redact-form__entry.input(
+                type="text" 
+                v-model="review.occ"
+                @input="checkField('review.occ')"
+              )
+              div.validate {{validation.firstError('review.occ')}}
           label.redact-form__row
-            .redact-form__block.redact-form__block--no-border(data-title="Отзыв")
-              textarea.redact-form__entry.textarea(name="textarea" type="text" v-model="review.text")              
+            .redact-form__block.redact-form__block--no-border(
+              data-title="Отзыв"
+              :class="{error: validation.hasError('review.text')}"
+            )
+              textarea.redact-form__entry.textarea(
+                name="textarea" 
+                type="text" v-model="review.text"
+                @input="checkField('review.text')"
+              )
+              div.validate {{validation.firstError('review.text')}}
           .redact-form__buttons
             button.cancel-btn(@click.prevent="cancellEditMode") Отмена
             button.action-btn(type="submit") Сохранить
@@ -25,8 +49,21 @@
 
 <script>
 import { mapActions } from "vuex";
+import { Validator } from "simple-vue-validator";
 
 export default {
+  mixins: [require("simple-vue-validator").mixin],
+  validators: {
+    "review.author"(value) {
+      return Validator.value(value).required("Заполните имя");
+    },
+    "review.occ"(value) {
+      return Validator.value(value).required("Заполните титул");
+    },
+    "review.text"(value) {
+      return Validator.value(value).required("Заполните отзыв");
+    }
+  },
   props: {
     currentReview: {
       type: Object,
@@ -42,7 +79,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions("reviews", ["editReview"]),
+    ...mapActions("reviews", ["editReview", "changeEditMode"]),
     ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
       this.changePhoto = true;
@@ -50,6 +87,8 @@ export default {
     },
     async editCurrentReview() {
       try {
+        let valid = await this.$validate();
+        if (!valid) return;
         if (this.changePhoto) {
           this.createReview();
           await this.editReview({ data: this.formData, id: this.review.id });
@@ -57,7 +96,7 @@ export default {
           await this.editReview({ data: this.review, id: this.review.id });
         }
         this.showTooltip({ success: "Изменения внесены" });
-        this.cancellEditMode();
+        this.changeEditMode(false);
       } catch (error) {
         this.showTooltip({ error: error.message });
       }
@@ -68,7 +107,10 @@ export default {
       this.formData.append("text", this.newReview.text);
     },
     cancellEditMode() {
-      this.$emit("cancellEditMode");
+      this.changeEditMode(false);
+    },
+    async checkField(field) {
+      await this.$validate(field);
     }
   },
   created() {
@@ -79,6 +121,30 @@ export default {
 
 <style lang="postcss" scoped>
 @import "../../styles/mixins.pcss";
+
+.validate {
+  position: absolute;
+  color: #fff;
+  background-color: $red;
+  font-size: 14px;
+  padding: 8px 12px;
+  left: 20px;
+  bottom: 0;
+  transform: translateY(100%);
+  line-height: 1.2;
+  display: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: $red;
+    top: -5px;
+    left: 50%;
+    transform: translate(-50%) rotate(45deg);
+  }
+}
 
 .redact-form {
   position: relative;
@@ -126,7 +192,7 @@ export default {
       border-color: $red;
     }
 
-    & .block-validate {
+    & .validate {
       display: block;
     }
   }

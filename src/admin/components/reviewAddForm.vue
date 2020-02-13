@@ -4,20 +4,48 @@
     form.redact-form(@submit.prevent="addNewReview")
       .review-edit
         .review-edit__image
-          .avatar-load
+          .avatar-load(:class="{error: validation.hasError('newReview.photo')}")
             .avatar-load__image
             label.avatar-load__field
               .avatar-load__desc Добавить фото
-              input.avatar-load__file(type="file" @change="loadFile($event)")
+              input.avatar-load__file(
+                type="file" 
+                @change="loadFile($event)"
+              )
+            div.validate {{validation.firstError('newReview.photo')}}
         .review-edit__form            
           label.redact-form__row
-            .redact-form__block(data-title="Имя автора")
-              input.redact-form__entry.input(type="text" v-model="newReview.author")
-            .redact-form__block(data-title="Титул автора")
-              input.redact-form__entry.input(type="text" v-model="newReview.occ")
+            .redact-form__block(
+              data-title="Имя автора"
+              :class="{error: validation.hasError('newReview.author')}"
+            )
+              input.redact-form__entry.input(
+                type="text" 
+                v-model="newReview.author"
+                @input="checkField('newReview.author')"
+              )
+              div.validate {{validation.firstError('newReview.author')}}
+            .redact-form__block(
+              data-title="Титул автора"
+              :class="{error: validation.hasError('newReview.occ')}"
+              )
+              input.redact-form__entry.input(
+                type="text" 
+                v-model="newReview.occ"
+                @input="checkField('newReview.occ')"
+              )
+              div.validate {{validation.firstError('newReview.occ')}}
           label.redact-form__row
-            .redact-form__block.redact-form__block--no-border(data-title="Отзыв")
-              textarea.redact-form__entry.textarea(name="textarea" type="text" v-model="newReview.text")
+            .redact-form__block.redact-form__block--no-border(
+              data-title="Отзыв"
+              :class="{error: validation.hasError('newReview.text')}"
+            )
+              textarea.redact-form__entry.textarea(
+                name="textarea" 
+                type="text" v-model="newReview.text"
+                @input="checkField('newReview.text')"
+              )
+              div.validate {{validation.firstError('newReview.text')}}
           .redact-form__buttons
             button.cancel-btn(@click.prevent="cancellAddMode") Отмена
             button.action-btn(type="submit") Сохранить
@@ -25,23 +53,41 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
+import { Validator } from "simple-vue-validator";
 
 export default {
+  mixins: [require("simple-vue-validator").mixin],
+  validators: {
+    "newReview.photo"(value) {
+      return Validator.value(value).required("Ошибка");
+    },
+    "newReview.author"(value) {
+      return Validator.value(value).required("Заполните имя");
+    },
+    "newReview.occ"(value) {
+      return Validator.value(value).required("Заполните титул");
+    },
+    "newReview.text"(value) {
+      return Validator.value(value).required("Заполните отзыв");
+    }
+  },
   data() {
     return {
       newReview: {
         author: "",
         occ: "",
-        text: ""
+        text: "",
+        photo: ""
       },
       formData: null
     };
   },
   methods: {
-    ...mapActions("reviews", ["addReview"]),
+    ...mapActions("reviews", ["addReview", "changeAddMode"]),
     ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
       this.formData.append("photo", event.target.files[0]);
+      this.newReview.photo = (this.formData.get("photo")).name;
     },
     createReview() {
       this.formData.append("author", this.newReview.author);
@@ -50,16 +96,21 @@ export default {
     },
     async addNewReview() {
       try {
+        let valid = await this.$validate();
+        if (!valid) return;
         this.createReview();
         await this.addReview(this.formData);
         this.showTooltip({ success: "Отзыв добавлен" });
-        this.cancellAddMode();
+        this.changeAddMode(false);
       } catch (error) {
         this.showTooltip({ error: error.message });
       }
     },
     cancellAddMode() {
-      this.$emit("cancellAddMode");
+      this.changeAddMode(false);
+    },
+    async checkField(field) {
+      await this.$validate(field);
     }
   },
   created() {
@@ -70,6 +121,30 @@ export default {
 
 <style lang="postcss" scoped>
 @import "../../styles/mixins.pcss";
+
+.validate {
+  position: absolute;
+  color: #fff;
+  background-color: $red;
+  font-size: 14px;
+  padding: 8px 12px;
+  left: 20px;
+  bottom: 0;
+  transform: translateY(100%);
+  line-height: 1.2;
+  display: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: $red;
+    top: -5px;
+    left: 50%;
+    transform: translate(-50%) rotate(45deg);
+  }
+}
 
 .redact-form {
   position: relative;
@@ -117,7 +192,7 @@ export default {
       border-color: $red;
     }
 
-    & .block-validate {
+    & .validate {
       display: block;
     }
   }
@@ -205,8 +280,10 @@ export default {
 
   &.error {
     border: 1px solid $red;
-    & .block-validate {
+    & .validate {
       display: block;
+      left: 50%;
+      transform: translate(-50%, 100%);
     }
   }
 }

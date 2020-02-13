@@ -31,11 +31,11 @@ export default {
     };
   },
   methods: {
-    ...mapActions("reviews", ["changeCurrentReview", "removeReview"]),    
+    ...mapActions("reviews", ["changeCurrentReview", "removeReview", "changeEditMode"]),    
     ...mapActions("tooltip", ["showTooltip"]),
     editCurrentReview() {
       this.changeCurrentReview(this.review);
-      this.$emit("enableEditMode");
+      this.changeEditMode(true);
     },
     async removeExistedReview() {
       try {

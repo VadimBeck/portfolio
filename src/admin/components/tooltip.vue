@@ -8,11 +8,13 @@
       .tooltip__success(
         :key="tooltip.successMessage"
         v-if="tooltip.successMessage"      
-      ) {{tooltip.successMessage}}   
+      ) {{tooltip.successMessage}}
+        .tooltip__close
       .tooltip__error(
         :key="tooltip.errorMessage"
         v-if="tooltip.errorMessage"      
       ) {{tooltip.errorMessage}}
+        .tooltip__close
 </template>
 
 <script>
@@ -40,24 +42,37 @@ export default {
 <style lang="postcss" scoped>
 .tooltip {
   position: fixed;
+  z-index: 5;
   bottom: 0;
   left: 50%;
   color: #fff;
+  font-weight: 600;
+  font-size: 18px;
 }
 
 .tooltip__success,
 .tooltip__error {
+  position: relative;
   transform: translate(-50%, 100%);
-  padding: 10px 15px;
+  padding: 20px 80px 20px 30px;
 
   &.active {
     animation: show;
     animation-duration: 2.5s;
   }
+  &::after {
+    content: '✖';
+    position: absolute;
+    cursor: pointer;
+    font-size: 20px;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 }
 
 .tooltip__success {
-  background-color: green;
+  background-color: $green;
 }
 
 .tooltip__error {
@@ -68,10 +83,10 @@ export default {
   from {
     transform: translate(-50%, 100%);
   }
-  15% {
+  10% {
     transform: translate(-50%, 0);
   }
-  85% {
+  90% {
     transform: translate(-50%, 0);
   }
   to {

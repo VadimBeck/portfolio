@@ -8,20 +8,54 @@
             .image-load__text Перетащите или загрузите для загрузки изображения
             label.image-load__field
               .action-btn Загрузить
-              input.image-load__file(type="file" @change="loadFile($event)")
+              input.image-load__file(
+                type="file" 
+                @change="loadFile($event)"
+              )
         .work-edit__form        
           label.redact-form__row                  
-            .redact-form__block(data-title="Название")
-              input.redact-form__entry.input(type="text" v-model="work.title")
+            .redact-form__block(data-title="Название"
+            :class="{error: validation.hasError('work.title')}"
+          )
+              input.redact-form__entry.input(
+                type="text" 
+                v-model="work.title"
+                @input="checkField('work.title')"
+              )
+              div.validate {{validation.firstError('work.title')}}
           label.redact-form__row
-            .redact-form__block(data-title="Ссылка")
-              input.redact-form__entry.input(type="text" v-model="work.link")
+            .redact-form__block(data-title="Ссылка"
+            :class="{error: validation.hasError('work.link')}"
+          )
+              input.redact-form__entry.input(
+                type="text" 
+                v-model="work.link"
+                @input="checkField('work.link')"
+              )
+              div.validate {{validation.firstError('work.link')}}
           label.redact-form__row
-            .redact-form__block.redact-form__block--no-border(data-title="Описание")
-              textarea.redact-form__entry.textarea(name="textarea" v-model="work.description" type="text")
+            .redact-form__block.redact-form__block--no-border(
+              data-title="Описание"
+              :class="{error: validation.hasError('work.description')}"
+            )
+              textarea.redact-form__entry.textarea(
+                type="text"
+                name="textarea" 
+                v-model="work.description"
+                @input="checkField('work.description')"
+              )
+              div.validate {{validation.firstError('work.description')}}
           label.redact-form__row
-            .redact-form__block(data-title="Добавление тэга")
-              input.redact-form__entry.input(type="text" v-model="work.techs")
+            .redact-form__block(
+              data-title="Добавление тэга"
+              :class="{error: validation.hasError('work.techs')}"
+            )
+              input.redact-form__entry.input(
+                type="text" 
+                v-model="work.techs"
+                @input="checkField('work.techs')"
+              )
+              div.validate {{validation.firstError('work.techs')}}
           .redact-form__tags
             ul.tags              
               li.tags__item(v-for="tag in tagsList")
@@ -34,8 +68,24 @@
 
 <script>
 import { mapActions } from "vuex";
+import { Validator } from "simple-vue-validator";
 
 export default {
+  mixins: [require("simple-vue-validator").mixin],
+  validators: {
+    "work.title"(value) {
+      return Validator.value(value).required("Заполните название");
+    },
+    "work.link"(value) {
+      return Validator.value(value).required("Заполните ссылку");
+    },
+    "work.description"(value) {
+      return Validator.value(value).required("Заполните описание");
+    },
+    "work.techs"(value) {
+      return Validator.value(value).required("Заполните технологии");
+    }
+  },
   props: {
     currentWork: {
       type: Object,
@@ -58,7 +108,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions("works", ["editWork"]),    
+    ...mapActions("works", ["editWork", "changeEditMode"]),    
     ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
       this.changePhoto = true;
@@ -66,14 +116,16 @@ export default {
     },
     async editCurrentWork() {
       try {
-        if (this.changePhoto) {
+        let valid = await this.$validate();
+        if (!valid) return;
+        if (this.changePhoto) {          
           this.createWork();
           await this.editWork({ data: this.formData, id: this.work.id });
         } else {
           await this.editWork({ data: this.work, id: this.work.id });
         }
         this.showTooltip({ success: "Изменения внесены" });
-        this.cancellEditMode();
+        this.changeEditMode(false);
       } catch (error) {
         this.showTooltip({ error: error.message });
       }
@@ -85,7 +137,10 @@ export default {
       this.formData.append("description", this.work.description);
     },
     cancellEditMode() {
-      this.$emit("cancellEditMode");
+      this.changeEditMode(false);
+    },
+    async checkField(field) {
+      await this.$validate(field);
     }
   },
   created() {
@@ -96,6 +151,30 @@ export default {
 
 <style lang="postcss" scoped>
 @import "../../styles/mixins.pcss";
+
+.validate {
+  position: absolute;
+  color: #fff;
+  background-color: $red;
+  font-size: 14px;
+  padding: 8px 12px;
+  left: 20px;
+  bottom: 0;
+  transform: translateY(100%);
+  line-height: 1.2;
+  display: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: $red;
+    top: -5px;
+    left: 50%;
+    transform: translate(-50%) rotate(45deg);
+  }
+}
 
 .redact-form {
   position: relative;
@@ -143,7 +222,7 @@ export default {
       border-color: $red;
     }
 
-    & .block-validate {
+    & .validate {
       display: block;
     }
   }

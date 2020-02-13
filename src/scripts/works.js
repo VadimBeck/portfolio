@@ -1,4 +1,5 @@
 import Vue from "vue";
+import axios from "axios";
 
 const thumbs = {
   template: "#slider-thumbs",
@@ -16,7 +17,8 @@ const display = {
     thumbs,
     buttons
   },
-  props: ["works", "displayedWorks", "currentWork", "currentIndex"]
+  props: ["works", "displayedWorks", "currentWork", "currentIndex"],
+  methods: {}
 };
 
 const tags = {
@@ -26,14 +28,22 @@ const tags = {
 
 const info = {
   template: "#slider-info",
+  props: ["currentWork"],
+  // data() {
+  // },
   components: {
     tags
   },
-  props: ["currentWork"],
   computed: {
     tagsArray() {
-      return this.currentWork.skills.split(", ");
+      return this.currentWork ? this.currentWork.techs.split(", "): ' ';
+    },
+    work() {
+      return {...this.currentWork}
     }
+    // tagsArray() {
+    //   return this.currentWork.techs.split(", ");
+    // }
   }
 };
 
@@ -62,14 +72,14 @@ new Vue({
     }
   },
   methods: {
-    makeArrayWithRequiredPics(data) {
-      return data.map(item => {
-        const requiredPic = require(`../images/content/${item.photo}`);
-        item.photo = requiredPic;
+    // makeArrayWithRequiredPics(data) {
+    //   return data.map(item => {
+    //     const requiredPic = require(`../images/content/${item.photo}`);
+    //     item.photo = requiredPic;
 
-        return item;
-      });
-    },
+    //     return item;
+    //   });
+    // },
 
     handleSlide(direction) {
       if (direction == "next" && this.currentIndex < this.works.length - 1) {
@@ -101,14 +111,24 @@ new Vue({
       }
     },
 
+    fetchWorks() {
+      axios
+        .get("https://webdev-api.loftschool.com/works/253")
+        .then(response => {
+          this.works = response.data;         
+        });
+    },
+
     checkActiveWork(index) {
       this.currentIndex = index + this.startIndex;
     }
   },
-  watch: {},
+  watch: {
+  },
   created() {
-    const data = require("../data/works.json");
-    this.works = this.makeArrayWithRequiredPics(data);
+    // const data = require("../data/works.json");
+    // this.works = this.makeArrayWithRequiredPics(data);
+    this.fetchWorks();
   },
   mounted() {
     window.addEventListener("resize", this.changeDisplayedCount);

@@ -17,13 +17,13 @@
           )
     .category__block(:class="{blocked:loading}")
       form.category__form(@submit.prevent="addNewSkill")
-        .category__skill-name          
-          input(type="text" placeholder="Новый навык" v-model="skill.title").category__entry.input
-          div.error {{validation.firstError('skill.title')}}
-        .category__skill-percent
-          input(type="text" placeholder="100" v-model="skill.percent").category__entry.input
+        .category__skill-name(:class="{error: validation.hasError('skill.title')}")
+          input(type="text" placeholder="Новый навык" v-model="skill.title" @input="checkField('skill.title')").category__entry.input
+          div.validate {{validation.firstError('skill.title')}}
+        .category__skill-percent(:class="{error: validation.hasError('skill.percent')}")
+          input(type="text" placeholder="100" v-model="skill.percent" @input="checkField('skill.percent')").category__entry.input
           span.category__percent-text %
-          div.error {{validation.firstError('skill.percent')}}
+          div.validate {{validation.firstError('skill.percent')}}
         button.add-btn(
           type="submit"
           :disabled="loading"
@@ -71,41 +71,62 @@ export default {
   methods: {
     ...mapActions("skills", ["addSkill"]),
     ...mapActions("categories", ["editCategory"]),
+    ...mapActions("tooltip", ["showTooltip"]),
     async addNewSkill() {
       try {
         let valid = await this.$validate();
         if (!valid) return;
         this.loading = true;
         await this.addSkill(this.skill);
+        this.showTooltip({ success: "Навык добавлен" });
         this.skill.title = "";
         this.skill.percent = null;
       } catch (error) {
-        alert(error.message);
+        this.showTooltip({ error: error.message });
       } finally {
         this.loading = false;
       }
     },
     async editCurrentCategory() {
+      
       try {
         await this.editCategory(this.category);
         this.editMode = false;
+        this.showTooltip({ success: "Изменения внесены" });
       } catch (error) {
-        alert(error.message);
+        this.showTooltip({ error: error.message });
       }
+    },
+    async checkField(field) {
+      await this.$validate(field);
     }
   }
 };
 </script>
 
 <style lang="postcss" scoped>
-.error {
+.validate {
   position: absolute;
-  color: $red;
-  font-weight: 600;
-  left: 0;
+  color: #fff;
+  background-color: $red;
+  left: 0px;
   font-size: 14px;
-  height: 40px;
-  bottom: -40px;
+  padding: 8px 12px;
+  bottom: 0;
+  transform: translateY(100%);
+  line-height: 1.2;
+  display: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: $red;
+    top: -5px;
+    left: 50%;
+    transform: translate(-50%) rotate(45deg);
+  }
 }
 
 .category {
@@ -157,7 +178,7 @@ export default {
   outline: none;
 
   &--accept {
-    background: svg-load("tick.svg", fill= "$green", width=100%, height=100%)
+    background: svg-load("tick.svg", fill= "$light-green", width=100%, height=100%)
       center center / 16px 16px no-repeat;
   }
   &--decline {
@@ -200,14 +221,22 @@ export default {
   justify-content: flex-end;
 }
 
+.category__skill-name, .category__skill-percent {
+  position: relative;
+  border-bottom: 1px solid $dark-blue;
+  &.error {
+    & .validate {
+      display: block;
+    }
+  }
+}
+
 .category__skill-name {
   flex: 1;
   max-width: 220px;
   padding-bottom: 10px;
   padding-left: 20px;
-  margin-right: 10px;
-  border-bottom: 1px solid $dark-blue;
-  position: relative;
+  margin-right: 10px;  
 }
 
 .category__skill-percent {
@@ -216,9 +245,7 @@ export default {
   text-align: center;
   max-width: 70px;
   padding: 0 10px 10px;
-  margin-right: 20px;
-  border-bottom: 1px solid $dark-blue;
-  position: relative;
+  margin-right: 20px;  
 }
 
 .add-btn {

@@ -2,7 +2,9 @@ export default {
   namespaced: true,
   state: {
     works: [],
-    currentWork: {}
+    currentWork: {},
+    addMode: false,
+    editMode: false
   },
   mutations: {
     SET_WORKS: (state, data) => (state.works = data),
@@ -21,6 +23,12 @@ export default {
       state.works = state.works.filter(
         work => work.id != deletedWork.id
       )
+    },
+    CHANGE_ADDMODE : (state, value) => {
+      state.addMode = value;
+    },
+    CHANGE_EDITMODE : (state, value) => {
+      state.editMode = value;
     }
   },
   actions: {
@@ -61,6 +69,12 @@ export default {
     },
     changeCurrentWork({ commit }, work) {
       commit("SET_CURRENT", work);
+    },
+    changeAddMode({ commit }, value) {
+      commit("CHANGE_ADDMODE", value);
+    },
+    changeEditMode({ commit }, value) {
+      commit("CHANGE_EDITMODE", value);
     }
   }
 };

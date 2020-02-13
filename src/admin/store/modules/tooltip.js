@@ -9,17 +9,19 @@ export default {
     }
   },
   mutations: {
+    SET_SUCCESS: (state, message) => (state.tooltip.successMessage = message),
+    SET_ERROR: (state, message) => (state.tooltip.errorMessage = message),
     CLEAR_TOOLTIP: (state) => {
       state.tooltip.successMessage = null;
       state.tooltip.errorMessage = null;
     }
   },
   actions: {    
-    showTooltip({state}, data) {
+    showTooltip({commit}, data) {
       if(data.success) {
-        state.tooltip.successMessage = data.success;
+        commit("SET_SUCCESS", data.success);
       } else {
-        state.tooltip.errorMessage = data.error;
+        commit("SET_ERROR", data.error);
       }
     },
     clearToltip({commit}) {

@@ -19,10 +19,9 @@ script(type="text/x-template")#slider-display
       transition-group(
         tag="div"
         name="fade"
-        mode="out-in"
       ).works-slider__display-image
         img(
-          :src="currentWork.photo"
+          src="#"
           v-for="(work, index) in works"
           v-if="index == currentIndex"
           :key="work.title"         
@@ -47,7 +46,7 @@ script(type="text/x-template")#slider-thumbs
       @click.prevent="$emit('checkWork', index)"
     )
       a.works-slider__thumbs-link
-        img(:src="work.photo", alt="", class="works-slider__thumbs-pic")
+        img(src="#", alt="", class="works-slider__thumbs-pic")
 
 
 script(type="text/x-template")#slider-buttons
@@ -64,10 +63,10 @@ script(type="text/x-template")#slider-info
       :tags="tagsArray"
     )
     .works-slider__text
-      h3.works-slider__subtitle {{currentWork.title}}
-      p.works-slider__description {{currentWork.desc}}
+      h3.works-slider__subtitle {{work.title}}
+      p.works-slider__description {{work.description}}
     .works-slider__link
-      a.iconed-link(:href="currentWork.link")
+      a.iconed-link(:href="work.link")
         +icon('link', 'iconed-link__icon')
         span.iconed-link__text Посмотреть сайт
 

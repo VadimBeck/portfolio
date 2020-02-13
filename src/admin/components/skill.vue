@@ -39,21 +39,24 @@ export default {
   },
   methods: {
     ...mapActions("skills", ["removeSkill", "editSkill"]),
+    ...mapActions("tooltip", ["showTooltip"]),
     async removeExistedSkill() {
       try {
         if (confirm("удалить запись?")) {
           await this.removeSkill(this.skill);
+          this.showTooltip({ success: "Навык удален" });
         }
       } catch (error) {
-        alert(error.message);
+        this.showTooltip({ error: error.message });
       }
     },
     async editExistedSkill() {
       try {
         await this.editSkill(this.editedSkill);
+        this.showTooltip({ success: "Изменения внесены" });
         this.editMode = false;
       } catch (error) {
-        alert(error.message);
+        this.showTooltip({ error: error.message });
       }
     }
   }
@@ -107,7 +110,7 @@ export default {
   outline: none;
 
   &--accept {
-    background: svg-load("tick.svg", fill= "$green", width=100%, height=100%)
+    background: svg-load("tick.svg", fill= "$light-green", width=100%, height=100%)
       center center / 16px 16px no-repeat;
   }
   &--decline {

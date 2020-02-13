@@ -2,7 +2,9 @@ export default {
   namespaced: true,
   state: {
     reviews: [],
-    currentReview: {}
+    currentReview: {},
+    addMode: false,
+    editMode: false
   },
   mutations: {
     SET_REVIEWS: (state, data) => (state.reviews = data),
@@ -21,6 +23,12 @@ export default {
     state.reviews = state.reviews.filter(
       review => review.id !== deletedReview.id
       )
+    },
+    CHANGE_ADDMODE : (state, value) => {
+      state.addMode = value;
+    },
+    CHANGE_EDITMODE : (state, value) => {
+      state.editMode = value;
     }
   },
   actions: {
@@ -61,6 +69,12 @@ export default {
     },
     changeCurrentReview({ commit }, review) {
       commit("SET_CURRENT", review);
+    },
+    changeAddMode({ commit }, value) {
+      commit("CHANGE_ADDMODE", value);
+    },
+    changeEditMode({ commit }, value) {
+      commit("CHANGE_EDITMODE", value);
     }
   }
 };

@@ -1,8 +1,9 @@
 <template lang="pug">
   .category
     .category__header
-      .category__group-name
-        input.category__entry.input(placeholder="Название новой группы" v-model="title")
+      .category__group-name(:class="{error: validation.hasError('title')}")
+        input.category__entry.input(placeholder="Название новой группы" v-model="title" @input="checkField('title')")
+        div.validate {{validation.firstError('title')}}
       .category__header-btns
         button.edit-btn.edit-btn--accept(@click="addNewCategory")
         button.edit-btn.edit-btn--decline(@click="cancelAddCategory")
@@ -20,8 +21,15 @@
 
 <script>
 import { mapActions } from "vuex";
+import { Validator } from "simple-vue-validator";
 
 export default {
+  mixins: [require("simple-vue-validator").mixin],
+  validators: {
+    "title"(value) {
+      return Validator.value(value).required("Заполните название");
+    }
+  },
   data() {
     return {
       title: ""
@@ -32,6 +40,8 @@ export default {
     ...mapActions("tooltip", ["showTooltip"]),
     async addNewCategory() {
       try {
+        let valid = await this.$validate();
+        if (!valid) return;
         await this.addCategory(this.title);
         this.title = "";
         this.showTooltip({ success: "Категория добавлена" });
@@ -42,12 +52,39 @@ export default {
     },
     cancelAddCategory() {
       this.$emit("cancelAddCategory");
+    },
+    async checkField(field) {
+      await this.$validate(field);
     }
   }
 };
 </script>
 
 <style lang="postcss" scoped>
+.validate {
+  position: absolute;
+  color: #fff;
+  background-color: $red;
+  font-size: 14px;
+  padding: 8px 12px;
+  left: 20px;
+  bottom: 0;
+  transform: translateY(100%);
+  line-height: 1.2;
+  display: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: $red;
+    top: -5px;
+    left: 50%;
+    transform: translate(-50%) rotate(45deg);
+  }
+}
+
 .category {
   height: 100%;
   display: flex;
@@ -65,10 +102,18 @@ export default {
 }
 
 .category__group-name {
+  position: relative;
   padding-bottom: 8px;
   border-bottom: 1px solid $dark-blue;
   flex: 1;
   max-width: 275px;
+
+  &.error {
+    border-color: $red;
+    & .validate {
+      display: block;
+    }
+  }
 }
 
 .input {
@@ -97,7 +142,7 @@ export default {
   outline: none;
 
   &--accept {
-    background: svg-load("tick.svg", fill= "$green", width=100%, height=100%)
+    background: svg-load("tick.svg", fill= "$light-green", width=100%, height=100%)
       center center / 16px 16px no-repeat;
   }
   &--decline {

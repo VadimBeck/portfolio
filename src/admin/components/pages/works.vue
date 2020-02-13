@@ -3,24 +3,21 @@
     .container
       h2.section-title.works__title Блок «Работы»
       work-add-form(
-        v-if="addWorkMode"        
-        @cancellAddMode = "cancellAddMode"
+        v-if="addMode"
         )
       work-edit-form(
-        v-if="editWorkMode"
-        :currentWork="currentWork"
-        @cancellEditMode="cancellEditMode"      
+        v-if="editMode"
+        :currentWork="currentWork"     
         )
       .works-content
         ul.content-list
-          li.content-list__item(v-if="!addWorkMode")
+          li.content-list__item(v-if="!addMode")
             .append
-              button.append__button(@click="addWorkMode = true")
+              button.append__button(@click="enableAddMode")
               .append__text Добавить работу          
           li.content-list__item(v-for="work in works")
             work-item(              
               :work="work"
-              @enableEditMode="enableEditMode"
             )
     tooltip
 </template>
@@ -35,29 +32,19 @@ export default {
     workItem: () => import('../workItem'),
     tooltip: () => import("../tooltip")
   },
-  data() {
-    return {
-      addWorkMode: false,
-      editWorkMode: false
-    }
-  },
   computed: {
     ...mapState("works", {
       works: state => state.works,
-      currentWork: state => state.currentWork
+      currentWork: state => state.currentWork,
+      addMode: state => state.addMode,
+      editMode: state => state.editMode
     })
   },
   methods: {
-    ...mapActions("works", ["fetchWorks"]),
-    cancellAddMode() {      
-      this.addWorkMode = false;
-    },
-    cancellEditMode() {
-      this.editWorkMode = false;
-    },
-    enableEditMode() {
-      this.editWorkMode = true;
-    }    
+    ...mapActions("works", ["fetchWorks", "changeAddMode"]),
+    enableAddMode() {
+      this.changeAddMode(true);
+    }   
   },
   created() {
     this.fetchWorks();

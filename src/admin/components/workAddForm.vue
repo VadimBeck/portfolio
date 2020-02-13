@@ -4,24 +4,60 @@
     form.redact-form(@submit.prevent="addNewWork")
       .work-edit      
         .work-edit__image
-          .image-load
+          .image-load(:class="{error: validation.hasError('newWork.photo')}")
             .image-load__text Перетащите или загрузите для загрузки изображения
             label.image-load__field
               .action-btn Загрузить
-              input.image-load__file(type="file" @change="loadFile($event)")
+              input.image-load__file(
+                type="file" 
+                @change="loadFile($event)"     
+              )
+            div.validate {{validation.firstError('newWork.photo')}}
         .work-edit__form        
           label.redact-form__row                  
-            .redact-form__block(data-title="Название")
-              input.redact-form__entry.input(type="text" v-model="newWork.title")
+            .redact-form__block(
+              data-title="Название" 
+              :class="{error: validation.hasError('newWork.title')}"
+            )
+              input.redact-form__entry.input(
+                type="text" v-model="newWork.title"
+                @input="checkField('newWork.title')"
+              )
+              div.validate {{validation.firstError('newWork.title')}}
           label.redact-form__row
-            .redact-form__block(data-title="Ссылка")
-              input.redact-form__entry.input(type="text" v-model="newWork.link")
+            .redact-form__block(
+              data-title="Ссылка" 
+              :class="{error: validation.hasError('newWork.link')}"
+              )
+              input.redact-form__entry.input(
+                type="text" 
+                v-model="newWork.link" 
+                @input="checkField('newWork.link')"
+              )
+              div.validate {{validation.firstError('newWork.link')}}
           label.redact-form__row
-            .redact-form__block.redact-form__block--no-border(data-title="Описание")
-              textarea.redact-form__entry.textarea(name="textarea" v-model="newWork.description" type="text")
+            .redact-form__block.redact-form__block--no-border(
+              data-title="Описание" 
+              :class="{error: validation.hasError('newWork.description')}"
+            )
+              textarea.redact-form__entry.textarea(
+                type="text" 
+                name="textarea" 
+                v-model="newWork.description" 
+                @input="checkField('newWork.description')"
+              )
+              div.validate {{validation.firstError('newWork.description')}}
           label.redact-form__row
-            .redact-form__block(data-title="Добавление тэга")
-              input.redact-form__entry.input(type="text" v-model="newWork.techs")
+            .redact-form__block(
+              data-title="Добавление тэга" 
+              :class="{error: validation.hasError('newWork.techs')}"
+            )
+              input.redact-form__entry.input(
+                type="text" 
+                v-model="newWork.techs" 
+                @input="checkField('newWork.techs')"
+              )
+              div.validate {{validation.firstError('newWork.techs')}}
           .redact-form__tags
             ul.tags              
               li.tags__item(v-for="tag in tagsList")
@@ -34,15 +70,35 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
+import { Validator } from "simple-vue-validator";
 
 export default {
+  mixins: [require("simple-vue-validator").mixin],
+  validators: {
+    "newWork.photo"(value) {
+      return Validator.value(value).required("Ошибка");
+    },
+    "newWork.title"(value) {
+      return Validator.value(value).required("Заполните название");
+    },
+    "newWork.link"(value) {
+      return Validator.value(value).required("Заполните ссылку");
+    },
+    "newWork.description"(value) {
+      return Validator.value(value).required("Заполните описание");
+    },
+    "newWork.techs"(value) {
+      return Validator.value(value).required("Заполните технологии");
+    }
+  },
   data() {
     return {
       newWork: {
         title: "",
         techs: "",
         link: "",
-        description: ""
+        description: "",
+        photo: ""
       },
       formData: null
     };
@@ -50,15 +106,16 @@ export default {
   computed: {
     tagsList() {
       if (this.newWork.techs.length) {
-        return this.newWork.techs.split(",");
+        return this.newWork.techs.split(", ");
       }
     }
   },
   methods: {
-    ...mapActions("works", ["addWork"]),
+    ...mapActions("works", ["addWork", "changeAddMode"]),
     ...mapActions("tooltip", ["showTooltip"]),
-    loadFile(event) {
+    loadFile(event) {      
       this.formData.append("photo", event.target.files[0]);
+      this.newWork.photo = (this.formData.get("photo")).name;
     },
     createWork() {
       this.formData.append("title", this.newWork.title);
@@ -68,16 +125,22 @@ export default {
     },
     async addNewWork() {
       try {
+        let valid = await this.$validate();
+        if (!valid) return;
         this.createWork();
         await this.addWork(this.formData);
         this.showTooltip({ success: "Работа добавлена" });
-        this.cancellAddMode();
+        this.changeAddMode(false);
       } catch (error) {
         this.showTooltip({ error: error.message });
+        console.log(error.message);
       }
     },
     cancellAddMode() {
-      this.$emit("cancellAddMode");
+      this.changeAddMode(false);
+    },
+    async checkField(field) {
+      await this.$validate(field);
     }
   },
   created() {
@@ -88,6 +151,30 @@ export default {
 
 <style lang="postcss" scoped>
 @import "../../styles/mixins.pcss";
+
+.validate {
+  position: absolute;
+  color: #fff;
+  background-color: $red;
+  font-size: 14px;
+  padding: 8px 12px;
+  left: 20px;
+  bottom: 0;
+  transform: translateY(100%);
+  line-height: 1.2;
+  display: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: $red;
+    top: -5px;
+    left: 50%;
+    transform: translate(-50%) rotate(45deg);
+  }
+}
 
 .redact-form {
   position: relative;
@@ -135,7 +222,7 @@ export default {
       border-color: $red;
     }
 
-    & .block-validate {
+    & .validate {
       display: block;
     }
   }
@@ -255,8 +342,10 @@ export default {
 
   &.error {
     border: 1px solid $red;
-    & .block-validate {
+    & .validate {
       display: block;
+      left: 50%;
+      transform: translate(-50%, 100%);
     }
   }
 }
@@ -266,6 +355,7 @@ export default {
 }
 
 .image-load__text {
+  position: relative;
   max-width: 230px;
   opacity: 0.5;
   line-height: 1.7;

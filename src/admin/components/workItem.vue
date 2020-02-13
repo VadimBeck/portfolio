@@ -1,7 +1,7 @@
 <template lang="pug">
   .work
     .content-list__img
-      img(src="../../images/content/work1.jpg").content-list__img-pic
+      img(src="#").content-list__img-pic
     .content-list__info
       .content-list__subtitle {{work.title}}
       .content-list__desc {{work.description}}
@@ -28,11 +28,11 @@ export default {
     };
   },
   methods: {
-    ...mapActions("works", ["changeCurrentWork", "removeWork"]),
+    ...mapActions("works", ["changeCurrentWork", "removeWork", "changeEditMode"]),
     ...mapActions("tooltip", ["showTooltip"]),
     editCurrentWork() {
       this.changeCurrentWork(this.work);
-      this.$emit("enableEditMode");
+      this.changeEditMode(true);
     },
     async removeExistedWork() {
       try {
