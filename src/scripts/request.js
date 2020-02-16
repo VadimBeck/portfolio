@@ -15,6 +15,9 @@ const ajaxForm = function(form) {
   data.append("name", form.elements.name.value);
   data.append("email", form.elements.email.value);
   data.append("comment", form.elements.textarea.value);
+  // Correct response addings
+  data.append("phone", 8999001122);
+  data.append("to", form.elements.email.value);
 
   const promise = new Promise(function(resolve, reject) {
     const xhr = new XMLHttpRequest();
@@ -38,9 +41,11 @@ const submitForm = function() {
   const form = document.querySelector("#form");
 
   ajaxForm(form)
-    .then(() => openOverlay("Сообщение отправлено"))
-    .catch(error =>
-      openOverlay("Ошибка соединения с сервером, попробуйте позже", "error")
+    .then(() => openOverlay("Сообщение отправлено", null))
+    .catch(error => {
+      openOverlay("Произошла ошибка, попробуйте позже", "error");      
+    }
+      
     );
 };
 
@@ -76,9 +81,9 @@ function openOverlay(status, errorClass) {
   modalText.textContent = status;
 
   if (errorClass) {
-    modalText.classList.add(errorClass);
+    modalText.classList.add('error');    
   } else {
-    modalText.classList.remove(errorClass);
+    modalText.classList.remove('error');
   }
 
   closeButton.addEventListener("click", e => {
