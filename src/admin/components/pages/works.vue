@@ -11,7 +11,7 @@
         )
       .works-content
         ul.content-list
-          li.content-list__item(v-if="!addMode")
+          li.content-list__item(v-if="!addMode && !editMode")
             .append
               button.append__button(@click="enableAddMode")
               .append__text Добавить работу          

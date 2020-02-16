@@ -3,7 +3,7 @@
     .content-list__person.person
       .person__avatar
         .avatar
-          img(src="../../images/content/review2.jpg").avatar__pic
+          img(:src="photoURL").avatar__pic
       .person__info
         .person__name {{review.author}}
         .person__post {{review.occ}}
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default {
   props: {
@@ -30,10 +30,19 @@ export default {
       currentReview: { ...this.review }
     };
   },
+  computed: {
+    ...mapState("reviews", {
+      addMode: state => state.addMode
+    }),
+    photoURL() {
+      return `https://webdev-api.loftschool.com/${this.review.photo}`;
+    }
+  },
   methods: {
-    ...mapActions("reviews", ["changeCurrentReview", "removeReview", "changeEditMode"]),    
+    ...mapActions("reviews", ["changeCurrentReview", "removeReview", "changeEditMode", "changeAddMode"]),    
     ...mapActions("tooltip", ["showTooltip"]),
     editCurrentReview() {
+      if(this.addMode) this.changeAddMode(false);
       this.changeCurrentReview(this.review);
       this.changeEditMode(true);
     },
@@ -118,7 +127,8 @@ export default {
 .content-list__person {
   display: flex;
   align-items: center;
-  padding: 30px 0 30px 15px;
+  padding-left: 15px;
+  min-height: 120px;
   margin: 0 15px;
   border-bottom: 1px solid $grey;
 }
@@ -142,15 +152,16 @@ export default {
 }
 
 .avatar {
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   overflow: hidden;
 }
 
-.avatar__img {
+.avatar__pic {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top;
 }
 </style>

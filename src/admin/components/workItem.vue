@@ -1,7 +1,10 @@
 <template lang="pug">
   .work
     .content-list__img
-      img(src="#").content-list__img-pic
+      img(:src="photoURL").content-list__img-pic
+      .content-list__tags
+        .tag(v-for="tag in tagsList")
+          .tag__text {{tag}}
     .content-list__info
       .content-list__subtitle {{work.title}}
       .content-list__desc {{work.description}}
@@ -12,7 +15,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default {
   props: {
@@ -27,10 +30,24 @@ export default {
       currentWork: { ...this.work }
     };
   },
+  computed: {
+    ...mapState("works", {
+      addMode: state => state.addMode
+    }),
+    tagsList() {
+      if (this.work.techs.length) {
+        return this.work.techs.split(",");
+      }
+    },
+    photoURL() {
+      return `https://webdev-api.loftschool.com/${this.work.photo}`;
+    }
+  },
   methods: {
-    ...mapActions("works", ["changeCurrentWork", "removeWork", "changeEditMode"]),
+    ...mapActions("works", ["changeCurrentWork", "removeWork", "changeEditMode", "changeAddMode"]),
     ...mapActions("tooltip", ["showTooltip"]),
     editCurrentWork() {
+      if(this.addMode) this.changeAddMode(false);
       this.changeCurrentWork(this.work);
       this.changeEditMode(true);
     },
@@ -49,10 +66,42 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+@import "../../styles/mixins.pcss";
+
 .work {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.content-list__img {
+  position: relative;
+  height: 240px;
+
+  @include desktop {
+    height: 200px;
+  }
+
+  @include phones {
+    height: 250px;
+  }
+}
+
+.content-list__img-pic {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.content-list__tags {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
 .content-list__info {
@@ -122,5 +171,16 @@ export default {
       );
     }
   }
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  background: #f4f4f4;
+  font-size: 14Px;
+  border-radius: 30px;
 }
 </style>

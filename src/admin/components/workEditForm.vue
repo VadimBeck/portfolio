@@ -5,13 +5,17 @@
       .work-edit      
         .work-edit__image
           .image-load
-            .image-load__text Перетащите или загрузите для загрузки изображения
+            .image-load__photo(
+              :class="{filled: renderedPhoto.length}"
+              :style="{backgroundImage: `url(${renderedPhoto})`}"
+            )
+              img.image-load__pic(:src="photoURL")
             label.image-load__field
-              .action-btn Загрузить
               input.image-load__file(
                 type="file" 
-                @change="loadFile($event)"
+                @change="loadFile"
               )
+              .image-load__link Изменить превью
         .work-edit__form        
           label.redact-form__row                  
             .redact-form__block(data-title="Название"
@@ -58,12 +62,12 @@
               div.validate {{validation.firstError('work.techs')}}
           .redact-form__tags
             ul.tags              
-              li.tags__item(v-for="tag in tagsList")
+              li.tags__item(v-for="(tag,index) in tagsList")
                 span.tags__item-text {{tag}}
-                a.close-btn
+                a.close-btn(@click.prevent="removeTag(index)")
           .redact-form__buttons
             button.cancel-btn(@click.prevent="cancellEditMode") Отмена
-            button.action-btn(type="submit") Сохранить
+            button.action-btn(type="submit" :disabled="loading") Сохранить
 </template>
 
 <script>
@@ -95,9 +99,9 @@ export default {
   },
   data() {
     return {
-      formData: null,
       work: { ...this.currentWork },
-      changePhoto: false
+      renderedPhoto: "",
+      loading: false
     };
   },
   computed: {
@@ -105,46 +109,55 @@ export default {
       if (this.work.techs.length) {
         return this.work.techs.split(",");
       }
+    },
+    photoURL() {
+      return `https://webdev-api.loftschool.com/${this.currentWork.photo}`;
     }
   },
   methods: {
     ...mapActions("works", ["editWork", "changeEditMode"]),    
     ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
-      this.changePhoto = true;
-      this.formData.append("photo", event.target.files[0]);
+      const file = event.target.files[0];
+      this.work.photo = file;
+      this.renderImage(file);
+    },
+    renderImage(file) {
+      const reader = new FileReader();
+      try {
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+          this.renderedPhoto = reader.result; 
+        }        
+      } catch (error) {
+        this.showTooltip({ error: "Ошибка чтения файла" });
+      }      
     },
     async editCurrentWork() {
       try {
         let valid = await this.$validate();
         if (!valid) return;
-        if (this.changePhoto) {          
-          this.createWork();
-          await this.editWork({ data: this.formData, id: this.work.id });
-        } else {
-          await this.editWork({ data: this.work, id: this.work.id });
-        }
+        this.loading = true;
+        await this.editWork(this.work);
         this.showTooltip({ success: "Изменения внесены" });
         this.changeEditMode(false);
       } catch (error) {
         this.showTooltip({ error: error.message });
+      } finally {
+        this.loading = false;
       }
-    },
-    createWork() {
-      this.formData.append("title", this.work.title);
-      this.formData.append("techs", this.work.techs);
-      this.formData.append("link", this.work.link);
-      this.formData.append("description", this.work.description);
     },
     cancellEditMode() {
       this.changeEditMode(false);
     },
     async checkField(field) {
       await this.$validate(field);
+    },
+    removeTag(index) {
+      let tagArray = [...this.tagsList];
+      tagArray.splice(index, 1);
+      this.work.techs = tagArray.join(', ');
     }
-  },
-  created() {
-    this.formData = new FormData();
   }
 };
 </script>
@@ -315,36 +328,53 @@ export default {
   position: relative;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  min-height: 280px;
-  background: linear-gradient(to right, #949494 50%, transparent 0%) top / 20px
-      1px repeat-x,
-    linear-gradient(#949494 50%, transparent 0%) right / 1px 20px repeat-y,
-    linear-gradient(to left, #949494 50%, transparent 0%) bottom / 20px 1px
-      repeat-x,
-    linear-gradient(to top, #949494 50%, transparent 0%) left / 1px 20px
-      repeat-y,
-    $grey;
+  align-items: center; 
+}
 
-  &.error {
-    border: 1px solid $red;
-    & .block-validate {
-      display: block;
+.image-load__photo {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background-position: top center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  min-height: 340px;
+  max-height: 400px;
+
+  @include desktop {
+    min-height: 280px;
+  }
+
+  &.filled {
+    .image-load__pic {
+      display: none;
     }
   }
+}
+
+.image-load__pic {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-load__field {
+  margin-top: 10px;
+  padding: 20px 30px;
 }
 
 .image-load__file {
   display: none;
 }
 
-.image-load__text {
-  max-width: 230px;
-  opacity: 0.5;
-  line-height: 1.7;
-  margin-bottom: 30px;
+.image-load__link {
+  cursor: pointer;
+  display: block;
   text-align: center;
-  font-weight: 600;
+  color: $blue;
+  font-weight: 700;
+  font-size: 16px;
 }
 
 .edit-block {
@@ -409,6 +439,12 @@ export default {
   background: linear-gradient(to right, $light-blue, $blue);
   padding: 15px 30px;
   border-radius: 30px;
+
+  &:disabled {
+    filter: grayscale(90%);
+    opacity: 0.8;
+    pointer-events: none;
+  }
 }
 
 .cancel-btn {

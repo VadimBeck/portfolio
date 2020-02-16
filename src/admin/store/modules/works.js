@@ -12,22 +12,20 @@ export default {
     ADD_WORK: (state, work) => state.works.push(work),
     EDIT_WORK: (state, editedWork) => {
       state.works.map(work => {
-        if(work.id === editedWork.id) {
-          for(let key in work) {
+        if (work.id === editedWork.id) {
+          Object.keys(work).forEach(key => {
             work[key] = editedWork[key];
-          }
-        }                       
-      })
+          });
+        }
+      });
     },
     REMOVE_WORK: (state, deletedWork) => {
-      state.works = state.works.filter(
-        work => work.id != deletedWork.id
-      )
+      state.works = state.works.filter(work => work.id != deletedWork.id);
     },
-    CHANGE_ADDMODE : (state, value) => {
+    CHANGE_ADDMODE: (state, value) => {
       state.addMode = value;
     },
-    CHANGE_EDITMODE : (state, value) => {
+    CHANGE_EDITMODE: (state, value) => {
       state.editMode = value;
     }
   },
@@ -41,19 +39,29 @@ export default {
       }
     },
     async addWork({ commit }, newWork) {
+      const formData = new FormData();
       try {
-        const { data } = await this.$axios.post("/works", newWork);
+        Object.keys(newWork).forEach(key => {
+          const value = newWork[key];
+          formData.append(key, value);
+        });
+        const { data } = await this.$axios.post("/works", formData);
         commit("ADD_WORK", data);
       } catch (error) {
         errorHandler(error);
       }
     },
     async editWork({ commit }, editedWork) {
+      const formData = new FormData();
       try {
+        Object.keys(editedWork).forEach(key => {
+          const value = editedWork[key];
+          formData.append(key, value);
+        });
         const { data } = await this.$axios.post(
           `/works/${editedWork.id}`,
-          editedWork.data
-        );      
+          formData
+        );
         commit("EDIT_WORK", data.work);
       } catch (error) {
         errorHandler(error);

@@ -5,10 +5,17 @@
       .review-edit
         .review-edit__image
           .avatar-load
-            .avatar-load__image
             label.avatar-load__field
-              .avatar-load__desc Добавить фото
-              input.avatar-load__file(type="file")
+              .avatar-load__image(
+                :class="{filled: renderedPhoto.length}"
+                :style="{backgroundImage: `url(${renderedPhoto})`}"
+              )
+                img.avatar-load__pic(:src="photoURL")
+              .avatar-load__desc Изменить фото
+              input.avatar-load__file(
+                type="file"
+                @change="loadFile"
+              )
         .review-edit__form            
           label.redact-form__row
             .redact-form__block(
@@ -44,7 +51,7 @@
               div.validate {{validation.firstError('review.text')}}
           .redact-form__buttons
             button.cancel-btn(@click.prevent="cancellEditMode") Отмена
-            button.action-btn(type="submit") Сохранить
+            button.action-btn(type="submit" :disabled="loading") Сохранить
 </template>
 
 <script>
@@ -70,41 +77,51 @@ export default {
       default: () => {},
       required: true
     }
-  },
+  },  
   data() {
     return {
-      formData: null,
       review: { ...this.currentReview },
-      changePhoto: false
+      renderedPhoto: "",
+      loading: false
     };
+  },
+  computed: {
+    photoURL() {
+      return `https://webdev-api.loftschool.com/${this.currentReview.photo}`;
+    }
   },
   methods: {
     ...mapActions("reviews", ["editReview", "changeEditMode"]),
     ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
-      this.changePhoto = true;
-      this.formData.append("photo", event.target.files[0]);
+      const file = event.target.files[0];
+      this.review.photo = file;
+      this.renderImage(file);
+    },
+    renderImage(file) {
+      const reader = new FileReader();
+      try {
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+          this.renderedPhoto = reader.result; 
+        }        
+      } catch (error) {
+        this.showTooltip({ error: "Ошибка чтения файла" });
+      }      
     },
     async editCurrentReview() {
       try {
         let valid = await this.$validate();
         if (!valid) return;
-        if (this.changePhoto) {
-          this.createReview();
-          await this.editReview({ data: this.formData, id: this.review.id });
-        } else {
-          await this.editReview({ data: this.review, id: this.review.id });
-        }
+        this.loading = true;
+        await this.editReview(this.review);
         this.showTooltip({ success: "Изменения внесены" });
         this.changeEditMode(false);
       } catch (error) {
         this.showTooltip({ error: error.message });
+      } finally {
+        this.loading = false;
       }
-    },
-    createReview() {
-      this.formData.append("author", this.newReview.author);
-      this.formData.append("occ", this.newReview.occ);
-      this.formData.append("text", this.newReview.text);
     },
     cancellEditMode() {
       this.changeEditMode(false);
@@ -112,9 +129,6 @@ export default {
     async checkField(field) {
       await this.$validate(field);
     }
-  },
-  created() {
-    this.formData = new FormData();
   }
 };
 </script>
@@ -291,14 +305,29 @@ export default {
 }
 
 .avatar-load__image {
+  cursor: pointer;
+  background-position: top center;
+  background-size: cover;
+  background-repeat: no-repeat;
   width: 200px;
   height: 200px;
   border-radius: 50%;
-  background-color: #dee4ed;
+  overflow: hidden;
   margin-bottom: 20px;
-  background: svg-load("user.svg", fill= "#fff") center center / 50% 50%
-      no-repeat,
-    #dee4ed;
+
+  &.filled {
+    .avatar-load__pic {
+      display: none;
+    }
+  }
+}
+
+.avatar-load__pic {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
 }
 
 .avatar-load__link {
@@ -335,6 +364,12 @@ export default {
   background: linear-gradient(to right, $light-blue, $blue);
   padding: 15px 30px;
   border-radius: 30px;
+
+  &:disabled {
+    filter: grayscale(90%);
+    opacity: 0.8;
+    pointer-events: none;
+  }
 }
 
 .cancel-btn {

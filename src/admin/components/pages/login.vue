@@ -6,10 +6,12 @@
         label.login__field(data-title='Логин' :class="{error: validation.hasError('user.name')}")
           .login__block
             input.login__input(type="text" v-model="user.name" @input="checkField('user.name')")
+            .login__block-image.login__block-image--name
           .validate {{validation.firstError('user.name')}}
         label.login__field(data-title='Пароль' :class="{error: validation.hasError('user.password')}")
           .login__block
             input.login__input(type="password" v-model="user.password" @input="checkField('user.password')")
+            .login__block-image.login__block-image--password
           .validate {{validation.firstError('user.password')}}
         .login__btn
           button.send-button(type="submit" :disabled="isSubmitBlocked") Отправить
@@ -28,10 +30,10 @@ export default {
       return Validator.value(value).required("Введите имя пользователя");
     },
     "user.password"(value) {
-      return Validator.value(value).required("Введите пароль")
+      return Validator.value(value).required("Введите пароль");
     }
   },
-  components: { 
+  components: {
     tooltip: () => import("../tooltip")
   },
   data() {
@@ -63,7 +65,7 @@ export default {
 
         this.$router.replace("/");
       } catch (error) {
-        this.showTooltip({ error: 'Неверное имя или пароль' });
+        this.showTooltip({ error: "Неверное имя или пароль" });
       } finally {
         this.loading = false;
       }
@@ -79,7 +81,7 @@ export default {
 @import "../../../styles/mixins.pcss";
 
 .login {
-  position: fixed;  
+  position: fixed;
   left: 0;
   top: 0;
   right: 0;
@@ -88,10 +90,11 @@ export default {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background: url(../../../images/main-admin.jpg) center center / cover no-repeat;
+  background: url(../../../images/main-admin.jpg) center center / cover
+    no-repeat;
 
   &:before {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     top: 0;
@@ -101,12 +104,6 @@ export default {
   }
 }
 
-.login__form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .login__inner {
   position: relative;
   display: flex;
@@ -114,7 +111,7 @@ export default {
   align-items: center;
   flex-direction: column;
   z-index: 2;
-  padding: 50px;
+  padding: 50px 60px;
   background-color: #fff;
   width: 80%;
   max-width: 400px;
@@ -126,6 +123,13 @@ export default {
   }
 }
 
+.login__form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
 .login__title {
   font-size: 21px;
   margin-bottom: 20px;
@@ -135,14 +139,9 @@ export default {
   position: relative;
   width: 100%;
   margin-bottom: 25px;
-  padding-left: 40px;
-  border-bottom: 1px solid rgba($text-color, 0.7);
-
-  &:hover {
-    border-color: $blue-violet;
-  }
 
   &:before {
+    padding-left: 40px;
     content: attr(data-title);
     margin-bottom: 15px;
     display: block;
@@ -151,30 +150,67 @@ export default {
   }
 
   &.error {
-    border-color: $red;
-
     & .validate {
       display: block;
     }
 
-    & .login__block::before {
-    content: svg-load('avatar.svg', fill='$red', width=100%, height=100%);
+    & .login__block {
+      & .login__input {
+        border-color: $red;
+      }
+
+      & .login__block-image--name {
+        background-image: svg-load(
+          "avatar.svg",
+          fill= "$red",
+          width=100%,
+          height=100%
+        );
+      }
+      & .login__block-image--password {
+        background-image: svg-load(
+          "key.svg",
+          fill= "$red",
+          width=100%,
+          height=100%
+        );
+      }
     }
   }
-  
 }
 
 .login__block {
   position: relative;
   font-size: 18px;
+  display: flex;
+  flex-direction: row-reverse;
+}
 
-  &:before {
-    content: svg-load('avatar.svg', fill='#a0a5b1', width=100%, height=100%);
-    position: absolute;
-    width: 25px;
-    height: 25px;
-    left: -40px;
-    top: -5px;
+.login__block-image {
+  position: absolute;
+  background-repeat: no-repeat;
+  left: 0;
+  top: 0;
+  width: 25px;
+  height: 25px;
+  margin-bottom: 5px;
+  margin-right: 10px;
+
+  &--name {
+    background-image: svg-load(
+      "avatar.svg",
+      fill= "#a0a5b1",
+      width=100%,
+      height=100%
+    );
+  }
+  &--password {
+    background-image: svg-load(
+      "key.svg",
+      fill= "#a0a5b1",
+      width=100%,
+      height=100%
+    );
   }
 }
 
@@ -185,6 +221,31 @@ export default {
   font-size: inherit;
   font-weight: 600;
   width: 100%;
+  padding-left: 40px;
+  line-height: 2;
+  height: 32px;
+  border-bottom: 1px solid rgba($text-color, 0.7);
+
+  &:focus,
+  &:hover {
+    border-color: $blue-violet;
+    & + .login__block-image--name {
+      background-image: svg-load(
+        "avatar.svg",
+        fill= "$blue-violet",
+        width=100%,
+        height=100%
+      );
+    }
+    & + .login__block-image--password {
+      background-image: svg-load(
+        "key.svg",
+        fill= "$blue-violet",
+        width=100%,
+        height=100%
+      );
+    }
+  }
 }
 
 .login__btn {
@@ -235,5 +296,4 @@ export default {
     transform: translate(-50%) rotate(45deg);
   }
 }
-
 </style>

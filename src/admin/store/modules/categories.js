@@ -56,7 +56,6 @@ export default {
       try {
         const response = await this.$axios.post("/categories", { title });        
         commit("ADD_CATEGORY", response.data);
-        //await this.$axios.delete("/categories/3718");
       } catch (error) {        
         errorHandler(error);
       }

@@ -44,7 +44,7 @@ export default {
         if (!valid) return;
         await this.addCategory(this.title);
         this.title = "";
-        this.showTooltip({ success: "Категория добавлена" });
+        this.showTooltip({ success: "Группа создана" });
         this.cancelAddCategory();
       } catch (error) {
         this.showTooltip({ error: error.message });
@@ -107,6 +107,10 @@ export default {
   border-bottom: 1px solid $dark-blue;
   flex: 1;
   max-width: 275px;
+
+  &:hover {
+    border-color: $blue-violet;
+  }
 
   &.error {
     border-color: $red;

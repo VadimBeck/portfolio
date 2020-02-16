@@ -4,15 +4,18 @@
     form.redact-form(@submit.prevent="addNewReview")
       .review-edit
         .review-edit__image
-          .avatar-load(:class="{error: validation.hasError('newReview.photo')}")
-            .avatar-load__image
+          .avatar-load(:class="{error: validation.hasError('renderedPhoto')}")
             label.avatar-load__field
+              .avatar-load__image(
+                :class="{filled: renderedPhoto.length}"
+                :style="{backgroundImage: `url(${renderedPhoto})`}"
+              )
               .avatar-load__desc Добавить фото
               input.avatar-load__file(
                 type="file" 
-                @change="loadFile($event)"
+                @change="loadFile"
               )
-            div.validate {{validation.firstError('newReview.photo')}}
+            div.validate {{validation.firstError('renderedPhoto')}}
         .review-edit__form            
           label.redact-form__row
             .redact-form__block(
@@ -48,7 +51,7 @@
               div.validate {{validation.firstError('newReview.text')}}
           .redact-form__buttons
             button.cancel-btn(@click.prevent="cancellAddMode") Отмена
-            button.action-btn(type="submit") Сохранить
+            button.action-btn(type="submit" :disabled="loading") Сохранить
 </template>
 
 <script>
@@ -58,7 +61,7 @@ import { Validator } from "simple-vue-validator";
 export default {
   mixins: [require("simple-vue-validator").mixin],
   validators: {
-    "newReview.photo"(value) {
+    "renderedPhoto"(value) {
       return Validator.value(value).required("Ошибка");
     },
     "newReview.author"(value) {
@@ -74,37 +77,55 @@ export default {
   data() {
     return {
       newReview: {
+        photo: {},
         author: "",
         occ: "",
-        text: "",
-        photo: ""
+        text: ""
       },
-      formData: null
+      renderedPhoto: "",
+      loading: false
     };
   },
   methods: {
     ...mapActions("reviews", ["addReview", "changeAddMode"]),
     ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
-      this.formData.append("photo", event.target.files[0]);
-      this.newReview.photo = (this.formData.get("photo")).name;
+      const file = event.target.files[0];
+      this.newReview.photo = file;
+      this.renderImage(file);
     },
-    createReview() {
-      this.formData.append("author", this.newReview.author);
-      this.formData.append("occ", this.newReview.occ);
-      this.formData.append("text", this.newReview.text);
+    renderImage(file) {
+      const reader = new FileReader();
+      try {
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+          this.renderedPhoto = reader.result;
+          this.checkField("renderedPhoto");   
+        }        
+      } catch (error) {
+        this.showTooltip({ error: "Ошибка чтения файла" });
+      }      
     },
     async addNewReview() {
       try {
         let valid = await this.$validate();
         if (!valid) return;
-        this.createReview();
-        await this.addReview(this.formData);
+        this.loading = true;  
+        await this.addReview(this.newReview);
         this.showTooltip({ success: "Отзыв добавлен" });
-        this.changeAddMode(false);
+        this.clearReview();
       } catch (error) {
         this.showTooltip({ error: error.message });
+      } finally {
+        this.loading = false;
       }
+    },
+    clearReview() {
+      this.renderedPhoto = "";
+      Object.keys(this.newReview).forEach(key => {
+        if(this.newReview[key] === "photo") this.newReview[key] = {};
+          this.newReview[key] = "";
+      });
     },
     cancellAddMode() {
       this.changeAddMode(false);
@@ -112,9 +133,6 @@ export default {
     async checkField(field) {
       await this.$validate(field);
     }
-  },
-  created() {
-    this.formData = new FormData();
   }
 };
 </script>
@@ -293,14 +311,34 @@ export default {
 }
 
 .avatar-load__image {
+  position: relative;
+  cursor: pointer;
+  background-position: top center;
+  background-size: cover;
+  background-repeat: no-repeat;
   width: 200px;
   height: 200px;
   border-radius: 50%;
   background-color: #dee4ed;
   margin-bottom: 20px;
-  background: svg-load("user.svg", fill= "#fff") center center / 50% 50%
-      no-repeat,
-    #dee4ed;
+  background-color: #dee4ed;
+
+  &.filled {
+    &::after {
+      display: none;
+    }
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+     background: svg-load("user.svg", fill= "#fff") center center / 50% 50%
+      no-repeat;
+  }
 }
 
 .avatar-load__link {
@@ -337,6 +375,12 @@ export default {
   background: linear-gradient(to right, $light-blue, $blue);
   padding: 15px 30px;
   border-radius: 30px;
+
+  &:disabled {
+    filter: grayscale(90%);
+    opacity: 0.8;
+    pointer-events: none;
+  }
 }
 
 .cancel-btn {

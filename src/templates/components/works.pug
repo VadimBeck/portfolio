@@ -21,10 +21,10 @@ script(type="text/x-template")#slider-display
         name="fade"
       ).works-slider__display-image
         img(
-          src="#"
+          :src="currentWork.photo"
           v-for="(work, index) in works"
           v-if="index == currentIndex"
-          :key="work.title"         
+          :key="work.id"         
         ).works-slider__display-pic
       thumbs(
         :displayedWorks="displayedWorks"
@@ -46,7 +46,7 @@ script(type="text/x-template")#slider-thumbs
       @click.prevent="$emit('checkWork', index)"
     )
       a.works-slider__thumbs-link
-        img(src="#", alt="", class="works-slider__thumbs-pic")
+        img(:src="work.photo", alt="", class="works-slider__thumbs-pic")
 
 
 script(type="text/x-template")#slider-buttons

@@ -8,11 +8,20 @@
       .header__text
         .header__user-name Вадим Бекитко
         .header__desc Панель админиcтрирования
-        a(href='#').login Выйти
+        a.logout-btn(@click="logoutUser") Выйти
 </template>
 
 <script>
-export default {};
+import {mapActions} from "vuex";
+export default {
+  methods: {
+    ...mapActions("user", ["logout"]),
+    logoutUser() {
+      this.logout();
+      this.$router.replace("/login");
+    }
+  }
+};
 </script>
 
 <style lang="postcss" scoped>
@@ -68,11 +77,21 @@ export default {};
   }
 }
 
-.login {
+.logout-btn {
+  cursor: pointer;
   margin-left: auto;
   opacity: 0.7;
   color: currentColor;
+  border-bottom: 1px solid currentColor;
+  transition: .2s;
+  line-height: 1.2;
+
+  &:hover {
+    border-color: transparent;
+  }
+
   @include phones {
+    margin-top: 5px;
     margin-left: 0;
   }
 }

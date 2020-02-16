@@ -41,20 +41,21 @@ export default {
 
 <style lang="postcss" scoped>
 .tooltip {
-  position: fixed;
+  position: fixed;  
   z-index: 5;
   bottom: 0;
   left: 50%;
   color: #fff;
-  font-weight: 600;
   font-size: 18px;
 }
 
 .tooltip__success,
 .tooltip__error {
+  min-width: 180px;
   position: relative;
   transform: translate(-50%, 100%);
-  padding: 20px 80px 20px 30px;
+  padding: 20px 30px;
+  padding-right: 80px;
 
   &.active {
     animation: show;

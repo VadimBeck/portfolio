@@ -9,3 +9,4 @@ import "./scripts/works";
 import "./scripts/reviews";
 import "./scripts/menu";
 import "./scripts/response";
+import "./scripts/anchorScroll";

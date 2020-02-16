@@ -14,7 +14,7 @@ new Vue({
         pageDots: false,
         wrapAround: false,
         groupCells: true,
-        adaptiveHeight: true,
+        adaptiveHeight: false,
         freeScroll: false,
         contain: true
       },
@@ -48,19 +48,20 @@ new Vue({
         nextBtn.disabled = false;
       }
     },
-    // makeArrayWithRequiredPics(data) {
-    //   return data.map(item => {
-    //     const requiredPic = require(`../images/content/${item.photo}`);
-    //     item.photo = requiredPic;
+    takeImgAbsolutePath(data) {
+      return data.map(item => {
 
-    //     return item;
-    //   });
-    // }
+        item.photo = `https://webdev-api.loftschool.com/${item.photo}`;
+
+        return item;
+      });
+    },
     fetchReviews() {
       axios
         .get("https://webdev-api.loftschool.com/reviews/253")
         .then(response => {
-          this.reviews = response.data;
+          let data = response.data;
+          this.reviews = this.takeImgAbsolutePath(data);
           this.$nextTick(function () { this.$refs.flickity.rerender() });   
         });
     },

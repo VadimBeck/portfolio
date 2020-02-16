@@ -4,15 +4,18 @@
     form.redact-form(@submit.prevent="addNewWork")
       .work-edit      
         .work-edit__image
-          .image-load(:class="{error: validation.hasError('newWork.photo')}")
-            .image-load__text Перетащите или загрузите для загрузки изображения
+          .image-load(
+            :class="[{error: validation.hasError('renderedPhoto')}, {filled: renderedPhoto.length}]"
+            :style="{backgroundImage: `url(${renderedPhoto})`}"
+          )
             label.image-load__field
-              .action-btn Загрузить
               input.image-load__file(
-                type="file" 
-                @change="loadFile($event)"     
-              )
-            div.validate {{validation.firstError('newWork.photo')}}
+                  type="file" 
+                  @change="loadFile"
+                )
+              .image-load__text Перетащите или загрузите для загрузки изображения
+              .action-btn Загрузить              
+            div.validate {{validation.firstError('renderedPhoto')}}
         .work-edit__form        
           label.redact-form__row                  
             .redact-form__block(
@@ -60,12 +63,12 @@
               div.validate {{validation.firstError('newWork.techs')}}
           .redact-form__tags
             ul.tags              
-              li.tags__item(v-for="tag in tagsList")
+              li.tags__item(v-for="(tag,index) in tagsList")
                 span.tags__item-text {{tag}}
-                button.close-btn
+                a.close-btn(@click.prevent="removeTag(index)")
           .redact-form__buttons
             button.cancel-btn(@click.prevent="cancellAddMode") Отмена
-            button.action-btn(type="submit") Сохранить
+            button.action-btn(type="submit" :disabled="loading") Сохранить
 </template>
 
 <script>
@@ -75,7 +78,7 @@ import { Validator } from "simple-vue-validator";
 export default {
   mixins: [require("simple-vue-validator").mixin],
   validators: {
-    "newWork.photo"(value) {
+    "renderedPhoto"(value) {
       return Validator.value(value).required("Ошибка");
     },
     "newWork.title"(value) {
@@ -94,13 +97,14 @@ export default {
   data() {
     return {
       newWork: {
+        photo: {},
         title: "",
         techs: "",
         link: "",
-        description: "",
-        photo: ""
+        description: ""        
       },
-      formData: null
+      renderedPhoto: "",
+      loading: false
     };
   },
   computed: {
@@ -113,38 +117,55 @@ export default {
   methods: {
     ...mapActions("works", ["addWork", "changeAddMode"]),
     ...mapActions("tooltip", ["showTooltip"]),
-    loadFile(event) {      
-      this.formData.append("photo", event.target.files[0]);
-      this.newWork.photo = (this.formData.get("photo")).name;
+    loadFile(event) {
+      const file = event.target.files[0];
+      this.newWork.photo = file;
+      this.renderImage(file);
     },
-    createWork() {
-      this.formData.append("title", this.newWork.title);
-      this.formData.append("techs", this.newWork.techs);
-      this.formData.append("link", this.newWork.link);
-      this.formData.append("description", this.newWork.description);
+    renderImage(file) {
+      const reader = new FileReader();
+      try {
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+          this.renderedPhoto = reader.result;
+          this.checkField("renderedPhoto");   
+        }        
+      } catch (error) {
+        this.showTooltip({ error: "Ошибка чтения файла" });
+      }      
     },
     async addNewWork() {
       try {
         let valid = await this.$validate();
-        if (!valid) return;
-        this.createWork();
-        await this.addWork(this.formData);
+        if (!valid) return;        
+        this.loading = true;
+        await this.addWork(this.newWork);
         this.showTooltip({ success: "Работа добавлена" });
-        this.changeAddMode(false);
+        this.clearWork();
       } catch (error) {
         this.showTooltip({ error: error.message });
-        console.log(error.message);
+      } finally {
+        this.loading = false;
       }
+    },
+    clearWork() {
+      this.renderedPhoto = "";
+      Object.keys(this.newWork).forEach(key => {
+        if(this.newWork[key] === "photo") this.newWork[key] = {};
+          this.newWork[key] = "";
+      });
     },
     cancellAddMode() {
       this.changeAddMode(false);
     },
     async checkField(field) {
       await this.$validate(field);
+    },
+    removeTag(index) {
+      let tagArray = [...this.tagsList];
+      tagArray.splice(index, 1);
+      this.newWork.techs = tagArray.join(', ');
     }
-  },
-  created() {
-    this.formData = new FormData();
   }
 };
 </script>
@@ -253,7 +274,6 @@ export default {
 
 .redact-form__tags {
   margin-bottom: 35px;
-  min-height: 40px;
 }
 
 .redact-form__buttons {
@@ -301,10 +321,7 @@ export default {
   width: 20px;
   height: 20px;
   position: relative;
-  background: none;
-  outline: none;
   cursor: pointer;
-  border: none;
   &:before,
   &:after {
     content: "";
@@ -313,7 +330,7 @@ export default {
     height: 2px;
     width: 14px;
     left: 50%;
-    right: 50%;
+    top: 50%;
     background-color: #414c63;
   }
   &:before {
@@ -326,11 +343,37 @@ export default {
 
 .image-load {
   display: flex;
-  position: relative;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 280px;
+  position: relative;
+  background-position: top center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+
+  &.error {
+    border: 1px dashed $red;
+    & .validate {
+      display: block;
+      left: 50%;
+      transform: translate(-50%, 100%);
+    }
+    & .image-load__field{
+      background: $grey;
+    }
+  }
+  &.filled {
+    .image-load__text, .action-btn {
+      display: none;
+    }
+    .image-load__field {
+      background: none;
+    }
+  }
+}
+
+.image-load__field {
   background: linear-gradient(to right, #949494 50%, transparent 0%) top / 20px
       1px repeat-x,
     linear-gradient(#949494 50%, transparent 0%) right / 1px 20px repeat-y,
@@ -339,15 +382,13 @@ export default {
     linear-gradient(to top, #949494 50%, transparent 0%) left / 1px 20px
       repeat-y,
     $grey;
-
-  &.error {
-    border: 1px solid $red;
-    & .validate {
-      display: block;
-      left: 50%;
-      transform: translate(-50%, 100%);
-    }
-  }
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+  min-height: 280px;
 }
 
 .image-load__file {
@@ -407,6 +448,12 @@ export default {
   background: linear-gradient(to right, $light-blue, $blue);
   padding: 15px 30px;
   border-radius: 30px;
+
+  &:disabled {
+    filter: grayscale(90%);
+    opacity: 0.8;
+    pointer-events: none;
+  }
 }
 
 .work-edit__form {

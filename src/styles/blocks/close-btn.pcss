@@ -1,7 +1,4 @@
-.close-btn {
-  position: absolute;
-  top: 60px;
-  right: 30px;
+.close-btn {  
   display: block;
   overflow: hidden;
   outline: none;
@@ -11,6 +8,10 @@
   width: 24px;
   height: 20px;
 
+  &:hover {
+    color: $blue-violet;
+  }
+
   &::before, &::after {
     content: '';
     position: absolute;
@@ -18,7 +19,6 @@
     height: 4px;
     background-color: currentColor;
     right: 0;
-    transition: transform 0.1s 0s;
   }
 
   &::before {

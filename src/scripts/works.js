@@ -1,6 +1,10 @@
 import Vue from "vue";
 import axios from "axios";
 
+const $axios = axios.create({
+  baseURL: "https://webdev-api.loftschool.com"
+});
+
 const thumbs = {
   template: "#slider-thumbs",
   props: ["displayedWorks", "currentWork"]
@@ -17,8 +21,7 @@ const display = {
     thumbs,
     buttons
   },
-  props: ["works", "displayedWorks", "currentWork", "currentIndex"],
-  methods: {}
+  props: ["works", "displayedWorks", "currentWork", "currentIndex"]
 };
 
 const tags = {
@@ -28,9 +31,9 @@ const tags = {
 
 const info = {
   template: "#slider-info",
-  props: ["currentWork"],
-  // data() {
-  // },
+  props: {
+    currentWork: Object
+  },
   components: {
     tags
   },
@@ -41,9 +44,6 @@ const info = {
     work() {
       return {...this.currentWork}
     }
-    // tagsArray() {
-    //   return this.currentWork.techs.split(", ");
-    // }
   }
 };
 
@@ -72,15 +72,6 @@ new Vue({
     }
   },
   methods: {
-    // makeArrayWithRequiredPics(data) {
-    //   return data.map(item => {
-    //     const requiredPic = require(`../images/content/${item.photo}`);
-    //     item.photo = requiredPic;
-
-    //     return item;
-    //   });
-    // },
-
     handleSlide(direction) {
       if (direction == "next" && this.currentIndex < this.works.length - 1) {
         this.currentIndex++;
@@ -111,11 +102,21 @@ new Vue({
       }
     },
 
+    takeImgAbsolutePath(data) {
+      return data.map(item => {
+
+        item.photo = `https://webdev-api.loftschool.com/${item.photo}`;
+
+        return item;
+      });
+    },
+
     fetchWorks() {
-      axios
-        .get("https://webdev-api.loftschool.com/works/253")
+      $axios
+        .get("/works/253")
         .then(response => {
-          this.works = response.data;         
+          let data = response.data;
+          this.works = this.takeImgAbsolutePath(data);
         });
     },
 
@@ -126,8 +127,6 @@ new Vue({
   watch: {
   },
   created() {
-    // const data = require("../data/works.json");
-    // this.works = this.makeArrayWithRequiredPics(data);
     this.fetchWorks();
   },
   mounted() {

@@ -1,7 +1,10 @@
 script(type="text/x-template")#skills-list
   .values__widget-content
     ul.skills
-      li.skills__item(v-for="category in categories")
+      li.skills__item(
+        v-for="category in categories"
+        v-if="category.skills.length"
+      )
         skills-row(
           :category="category"
         )
@@ -12,13 +15,12 @@ script(type="text/x-template")#skills-row
     ul.skills-row__list
       li.skills-row__item(v-for="skill in category.skills") 
         skill(
-          :skillName="skill.title"
-          :skillPercent="skill.percent"
+          :skill="skill"
         )
 
 script(type="text/x-template")#skill
   .skill
-    .skill__title {{skillName}}
+    .skill__title {{skill.title}}
     svg.skill__circle-svg(version="1.1" viewBox="0 0 150 150" preserveAspectRatio="none")
       circle.skill__circle.skill__circle--inner(cx="75" cy="75" r="65")
       circle.skill__circle.skill__circle--outer(ref="color-circle" cx="75" cy="75" r="65" stroke="url(#gradient)" transform="rotate(180 75 75)")
