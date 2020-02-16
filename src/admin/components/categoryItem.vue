@@ -88,7 +88,6 @@ export default {
       }
     },
     async editCurrentCategory() {
-      
       try {
         await this.editCategory(this.category);
         this.editMode = false;
@@ -178,7 +177,12 @@ export default {
   outline: none;
 
   &--accept {
-    background: svg-load("tick.svg", fill= "$light-green", width=100%, height=100%)
+    background: svg-load(
+        "tick.svg",
+        fill= "$light-green",
+        width=100%,
+        height=100%
+      )
       center center / 16px 16px no-repeat;
   }
   &--decline {
@@ -221,7 +225,8 @@ export default {
   justify-content: flex-end;
 }
 
-.category__skill-name, .category__skill-percent {
+.category__skill-name,
+.category__skill-percent {
   position: relative;
   border-bottom: 1px solid $dark-blue;
   &.error {
@@ -236,7 +241,7 @@ export default {
   max-width: 220px;
   padding-bottom: 10px;
   padding-left: 20px;
-  margin-right: 10px;  
+  margin-right: 10px;
 }
 
 .category__skill-percent {
@@ -245,7 +250,7 @@ export default {
   text-align: center;
   max-width: 70px;
   padding: 0 10px 10px;
-  margin-right: 20px;  
+  margin-right: 20px;
 }
 
 .add-btn {

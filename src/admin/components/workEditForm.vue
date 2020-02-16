@@ -115,7 +115,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions("works", ["editWork", "changeEditMode"]),    
+    ...mapActions("works", ["editWork", "changeEditMode"]),
     ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
       const file = event.target.files[0];
@@ -127,11 +127,11 @@ export default {
       try {
         reader.readAsDataURL(file);
         reader.onloadend = () => {
-          this.renderedPhoto = reader.result; 
-        }        
+          this.renderedPhoto = reader.result;
+        };
       } catch (error) {
         this.showTooltip({ error: "Ошибка чтения файла" });
-      }      
+      }
     },
     async editCurrentWork() {
       try {
@@ -156,7 +156,7 @@ export default {
     removeTag(index) {
       let tagArray = [...this.tagsList];
       tagArray.splice(index, 1);
-      this.work.techs = tagArray.join(', ');
+      this.work.techs = tagArray.join(", ");
     }
   }
 };
@@ -328,7 +328,7 @@ export default {
   position: relative;
   flex-direction: column;
   justify-content: center;
-  align-items: center; 
+  align-items: center;
 }
 
 .image-load__photo {

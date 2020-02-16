@@ -1,9 +1,9 @@
 const shared = {
-  host: 'localhost',
+  host: "localhost",
   port: 4444,
-  path: '/wd/hub',
+  path: "/wd/hub",
   coloredLogs: true,
-  screenshotPath: './',
+  screenshotPath: "./",
   waitforTimeout: 10000,
   connectionRetryTimeout: 90000,
   connectionRetryCount: 3,
@@ -11,18 +11,24 @@ const shared = {
 };
 
 exports.firefox = {
-    ...shared,
-    desiredCapabilities: {
-        browserName: 'firefox'
-    }
+  ...shared,
+  desiredCapabilities: {
+    browserName: "firefox"
+  }
 };
 
 exports.chrome = {
   ...shared,
   desiredCapabilities: {
-      browserName: 'chrome',
-      chromeOptions: {
-          args: ["disable-gpu", 'no-sandbox', 'disable-setuid-sandbox', 'incognito', 'disable-dev-shm-usage']
-      }
+    browserName: "chrome",
+    chromeOptions: {
+      args: [
+        "disable-gpu",
+        "no-sandbox",
+        "disable-setuid-sandbox",
+        "incognito",
+        "disable-dev-shm-usage"
+      ]
+    }
   }
 };

@@ -137,4 +137,17 @@ export default {
     width: calc(100%-30px);
   }
 }
+
+.section-title {
+  display: flex;
+  align-items: center;
+  padding: 50px 0 50px;
+  font-size: 24px;
+
+  @include phones {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 50px 0 50px 20px;
+  }
+}
 </style>

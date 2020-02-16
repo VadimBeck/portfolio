@@ -44,10 +44,15 @@ export default {
     }
   },
   methods: {
-    ...mapActions("works", ["changeCurrentWork", "removeWork", "changeEditMode", "changeAddMode"]),
+    ...mapActions("works", [
+      "changeCurrentWork",
+      "removeWork",
+      "changeEditMode",
+      "changeAddMode"
+    ]),
     ...mapActions("tooltip", ["showTooltip"]),
     editCurrentWork() {
-      if(this.addMode) this.changeAddMode(false);
+      if (this.addMode) this.changeAddMode(false);
       this.changeCurrentWork(this.work);
       this.changeEditMode(true);
     },
@@ -180,7 +185,7 @@ export default {
   margin-right: 10px;
   margin-bottom: 10px;
   background: #f4f4f4;
-  font-size: 14Px;
+  font-size: 14px;
   border-radius: 30px;
 }
 </style>

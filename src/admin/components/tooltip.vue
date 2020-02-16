@@ -41,7 +41,7 @@ export default {
 
 <style lang="postcss" scoped>
 .tooltip {
-  position: fixed;  
+  position: fixed;
   z-index: 5;
   bottom: 0;
   left: 50%;
@@ -62,7 +62,7 @@ export default {
     animation-duration: 2.5s;
   }
   &::after {
-    content: '✖';
+    content: "✖";
     position: absolute;
     cursor: pointer;
     font-size: 20px;

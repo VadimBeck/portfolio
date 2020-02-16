@@ -77,7 +77,7 @@ export default {
       default: () => {},
       required: true
     }
-  },  
+  },
   data() {
     return {
       review: { ...this.currentReview },
@@ -103,11 +103,11 @@ export default {
       try {
         reader.readAsDataURL(file);
         reader.onloadend = () => {
-          this.renderedPhoto = reader.result; 
-        }        
+          this.renderedPhoto = reader.result;
+        };
       } catch (error) {
         this.showTooltip({ error: "Ошибка чтения файла" });
-      }      
+      }
     },
     async editCurrentReview() {
       try {

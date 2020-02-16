@@ -5,12 +5,12 @@
         h2.login__title Авторизация
         label.login__field(data-title='Логин' :class="{error: validation.hasError('user.name')}")
           .login__block
-            input.login__input(type="text" v-model="user.name" @input="checkField('user.name')")
+            input.login__input.login__input--name(type="text"  v-model="user.name" @input="checkField('user.name')")
             .login__block-image.login__block-image--name
           .validate {{validation.firstError('user.name')}}
         label.login__field(data-title='Пароль' :class="{error: validation.hasError('user.password')}")
           .login__block
-            input.login__input(type="password" v-model="user.password" @input="checkField('user.password')")
+            input.login__input.login__input--password(type="password" v-model="user.password" @input="checkField('user.password')")
             .login__block-image.login__block-image--password
           .validate {{validation.firstError('user.password')}}
         .login__btn

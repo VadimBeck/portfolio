@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import {mapActions} from "vuex";
+import { mapActions } from "vuex";
 export default {
   methods: {
     ...mapActions("user", ["logout"]),
@@ -83,7 +83,7 @@ export default {
   opacity: 0.7;
   color: currentColor;
   border-bottom: 1px solid currentColor;
-  transition: .2s;
+  transition: 0.2s;
   line-height: 1.2;
 
   &:hover {

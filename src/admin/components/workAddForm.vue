@@ -78,7 +78,7 @@ import { Validator } from "simple-vue-validator";
 export default {
   mixins: [require("simple-vue-validator").mixin],
   validators: {
-    "renderedPhoto"(value) {
+    renderedPhoto(value) {
       return Validator.value(value).required("Ошибка");
     },
     "newWork.title"(value) {
@@ -101,7 +101,7 @@ export default {
         title: "",
         techs: "",
         link: "",
-        description: ""        
+        description: ""
       },
       renderedPhoto: "",
       loading: false
@@ -128,16 +128,16 @@ export default {
         reader.readAsDataURL(file);
         reader.onloadend = () => {
           this.renderedPhoto = reader.result;
-          this.checkField("renderedPhoto");   
-        }        
+          this.checkField("renderedPhoto");
+        };
       } catch (error) {
         this.showTooltip({ error: "Ошибка чтения файла" });
-      }      
+      }
     },
     async addNewWork() {
       try {
         let valid = await this.$validate();
-        if (!valid) return;        
+        if (!valid) return;
         this.loading = true;
         await this.addWork(this.newWork);
         this.showTooltip({ success: "Работа добавлена" });
@@ -151,8 +151,8 @@ export default {
     clearWork() {
       this.renderedPhoto = "";
       Object.keys(this.newWork).forEach(key => {
-        if(this.newWork[key] === "photo") this.newWork[key] = {};
-          this.newWork[key] = "";
+        if (this.newWork[key] === "photo") this.newWork[key] = {};
+        this.newWork[key] = "";
       });
     },
     cancellAddMode() {
@@ -164,7 +164,7 @@ export default {
     removeTag(index) {
       let tagArray = [...this.tagsList];
       tagArray.splice(index, 1);
-      this.newWork.techs = tagArray.join(', ');
+      this.newWork.techs = tagArray.join(", ");
     }
   }
 };
@@ -351,7 +351,6 @@ export default {
   background-size: cover;
   background-repeat: no-repeat;
 
-
   &.error {
     border: 1px dashed $red;
     & .validate {
@@ -359,12 +358,13 @@ export default {
       left: 50%;
       transform: translate(-50%, 100%);
     }
-    & .image-load__field{
+    & .image-load__field {
       background: $grey;
     }
   }
   &.filled {
-    .image-load__text, .action-btn {
+    .image-load__text,
+    .action-btn {
       display: none;
     }
     .image-load__field {

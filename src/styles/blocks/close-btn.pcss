@@ -1,10 +1,10 @@
-.close-btn {  
+.close-btn {
   display: block;
   overflow: hidden;
   outline: none;
   padding: 0;
   color: currentColor;
-  background: transparent;  
+  background: transparent;
   width: 24px;
   height: 20px;
 
@@ -12,7 +12,8 @@
     color: $blue-violet;
   }
 
-  &::before, &::after {
+  &::before,
+  &::after {
     content: '';
     position: absolute;
     width: 24px;
@@ -25,6 +26,7 @@
     top: 8px;
     transform: rotate(-45deg);
   }
+
   &::after {
     bottom: 8px;
     transform: rotate(45deg);

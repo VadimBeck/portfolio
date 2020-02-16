@@ -61,7 +61,7 @@ import { Validator } from "simple-vue-validator";
 export default {
   mixins: [require("simple-vue-validator").mixin],
   validators: {
-    "renderedPhoto"(value) {
+    renderedPhoto(value) {
       return Validator.value(value).required("Ошибка");
     },
     "newReview.author"(value) {
@@ -100,17 +100,17 @@ export default {
         reader.readAsDataURL(file);
         reader.onloadend = () => {
           this.renderedPhoto = reader.result;
-          this.checkField("renderedPhoto");   
-        }        
+          this.checkField("renderedPhoto");
+        };
       } catch (error) {
         this.showTooltip({ error: "Ошибка чтения файла" });
-      }      
+      }
     },
     async addNewReview() {
       try {
         let valid = await this.$validate();
         if (!valid) return;
-        this.loading = true;  
+        this.loading = true;
         await this.addReview(this.newReview);
         this.showTooltip({ success: "Отзыв добавлен" });
         this.clearReview();
@@ -123,8 +123,8 @@ export default {
     clearReview() {
       this.renderedPhoto = "";
       Object.keys(this.newReview).forEach(key => {
-        if(this.newReview[key] === "photo") this.newReview[key] = {};
-          this.newReview[key] = "";
+        if (this.newReview[key] === "photo") this.newReview[key] = {};
+        this.newReview[key] = "";
       });
     },
     cancellAddMode() {
@@ -336,7 +336,7 @@ export default {
     height: 100%;
     left: 0;
     top: 0;
-     background: svg-load("user.svg", fill= "#fff") center center / 50% 50%
+    background: svg-load("user.svg", fill= "#fff") center center / 50% 50%
       no-repeat;
   }
 }

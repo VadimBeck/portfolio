@@ -110,7 +110,12 @@ export default {
   outline: none;
 
   &--accept {
-    background: svg-load("tick.svg", fill= "$light-green", width=100%, height=100%)
+    background: svg-load(
+        "tick.svg",
+        fill= "$light-green",
+        width=100%,
+        height=100%
+      )
       center center / 16px 16px no-repeat;
   }
   &--decline {

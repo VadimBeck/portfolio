@@ -39,10 +39,15 @@ export default {
     }
   },
   methods: {
-    ...mapActions("reviews", ["changeCurrentReview", "removeReview", "changeEditMode", "changeAddMode"]),    
+    ...mapActions("reviews", [
+      "changeCurrentReview",
+      "removeReview",
+      "changeEditMode",
+      "changeAddMode"
+    ]),
     ...mapActions("tooltip", ["showTooltip"]),
     editCurrentReview() {
-      if(this.addMode) this.changeAddMode(false);
+      if (this.addMode) this.changeAddMode(false);
       this.changeCurrentReview(this.review);
       this.changeEditMode(true);
     },
