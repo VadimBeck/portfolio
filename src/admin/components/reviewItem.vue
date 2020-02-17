@@ -3,7 +3,7 @@
     .content-list__person.person
       .person__avatar
         .avatar
-          img(src="../../images/content/review2.jpg").avatar__pic
+          img(:src="photoURL").avatar__pic
       .person__info
         .person__name {{review.author}}
         .person__post {{review.occ}}
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default {
   props: {
@@ -30,19 +30,35 @@ export default {
       currentReview: { ...this.review }
     };
   },
+  computed: {
+    ...mapState("reviews", {
+      addMode: state => state.addMode
+    }),
+    photoURL() {
+      return `https://webdev-api.loftschool.com/${this.review.photo}`;
+    }
+  },
   methods: {
-    ...mapActions("reviews", ["changeCurrentReview", "removeReview"]),
+    ...mapActions("reviews", [
+      "changeCurrentReview",
+      "removeReview",
+      "changeEditMode",
+      "changeAddMode"
+    ]),
+    ...mapActions("tooltip", ["showTooltip"]),
     editCurrentReview() {
+      if (this.addMode) this.changeAddMode(false);
       this.changeCurrentReview(this.review);
-      this.$emit("enableEditMode");
+      this.changeEditMode(true);
     },
     async removeExistedReview() {
       try {
         if (confirm("удалить отзыв?")) {
           await this.removeReview(this.currentReview);
+          this.showTooltip({ success: "Отзыв удален" });
         }
       } catch (error) {
-        alert(error.message);
+        this.showTooltip({ error: error.message });
       }
     }
   }
@@ -51,7 +67,10 @@ export default {
 
 <style lang="postcss" scoped>
 .content-list__info {
-  padding: 30px 25px 25px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px 15px 25px 25px;
 }
 
 .content-list__subtitle {
@@ -70,7 +89,8 @@ export default {
 .content-list__btns {
   display: flex;
   justify-content: space-between;
-  margin-top: 35px;
+  margin-top: auto;
+  padding-top: 15px;
 }
 
 .edit-link {
@@ -112,7 +132,8 @@ export default {
 .content-list__person {
   display: flex;
   align-items: center;
-  padding: 30px 0 30px 15px;
+  padding-left: 15px;
+  min-height: 120px;
   margin: 0 15px;
   border-bottom: 1px solid $grey;
 }
@@ -136,15 +157,16 @@ export default {
 }
 
 .avatar {
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   overflow: hidden;
 }
 
-.avatar__img {
+.avatar__pic {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top;
 }
 </style>

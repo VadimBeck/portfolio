@@ -5,37 +5,99 @@
       .work-edit      
         .work-edit__image
           .image-load
-            .image-load__text Перетащите или загрузите для загрузки изображения
+            .image-load__photo(
+              :class="[{filled: renderedPhoto.length}, {loaded:drag}]"
+              :style="{backgroundImage: `url(${renderedPhoto})`}"
+            )
+              img.image-load__pic(:src="photoURL")
+              label.image-load__photo-field
+                input.image-load__photo-file(
+                  type="file"
+                  @change="loadFile"
+                  @drop="loadFile"
+                  @dragover="drag=true"
+                  @dragleave="drag=false"
+                )
             label.image-load__field
-              .action-btn Загрузить
-              input.image-load__file(type="file" @change="loadFile($event)")
+              input.image-load__file(
+                type="file" 
+                @change="loadFile"
+              )
+              .image-load__link Изменить превью
         .work-edit__form        
           label.redact-form__row                  
-            .redact-form__block(data-title="Название")
-              input.redact-form__entry.input(type="text" v-model="work.title")
+            .redact-form__block(data-title="Название"
+            :class="{error: validation.hasError('work.title')}"
+          )
+              input.redact-form__entry.input(
+                type="text" 
+                v-model="work.title"
+                @input="checkField('work.title')"
+              )
+              div.validate {{validation.firstError('work.title')}}
           label.redact-form__row
-            .redact-form__block(data-title="Ссылка")
-              input.redact-form__entry.input(type="text" v-model="work.link")
+            .redact-form__block(data-title="Ссылка"
+            :class="{error: validation.hasError('work.link')}"
+          )
+              input.redact-form__entry.input(
+                type="text" 
+                v-model="work.link"
+                @input="checkField('work.link')"
+              )
+              div.validate {{validation.firstError('work.link')}}
           label.redact-form__row
-            .redact-form__block.redact-form__block--no-border(data-title="Описание")
-              textarea.redact-form__entry.textarea(name="textarea" v-model="work.description" type="text")
+            .redact-form__block.redact-form__block--no-border(
+              data-title="Описание"
+              :class="{error: validation.hasError('work.description')}"
+            )
+              textarea.redact-form__entry.textarea(
+                type="text"
+                name="textarea" 
+                v-model="work.description"
+                @input="checkField('work.description')"
+              )
+              div.validate {{validation.firstError('work.description')}}
           label.redact-form__row
-            .redact-form__block(data-title="Добавление тэга")
-              input.redact-form__entry.input(type="text" v-model="work.techs")
+            .redact-form__block(
+              data-title="Добавление тэга"
+              :class="{error: validation.hasError('work.techs')}"
+            )
+              input.redact-form__entry.input(
+                type="text" 
+                v-model="work.techs"
+                @input="checkField('work.techs')"
+              )
+              div.validate {{validation.firstError('work.techs')}}
           .redact-form__tags
             ul.tags              
-              li.tags__item(v-for="tag in tagsList")
+              li.tags__item(v-for="(tag,index) in tagsList")
                 span.tags__item-text {{tag}}
-                a.close-btn
+                a.close-btn(@click.prevent="removeTag(index)")
           .redact-form__buttons
             button.cancel-btn(@click.prevent="cancellEditMode") Отмена
-            button.action-btn(type="submit") Сохранить
+            button.action-btn(type="submit" :disabled="loading") Сохранить
 </template>
 
 <script>
 import { mapActions } from "vuex";
+import { Validator } from "simple-vue-validator";
 
 export default {
+  mixins: [require("simple-vue-validator").mixin],
+  validators: {
+    "work.title"(value) {
+      return Validator.value(value).required("Заполните название");
+    },
+    "work.link"(value) {
+      return Validator.value(value).required("Заполните ссылку");
+    },
+    "work.description"(value) {
+      return Validator.value(value).required("Заполните описание");
+    },
+    "work.techs"(value) {
+      return Validator.value(value).required("Заполните технологии");
+    }
+  },
   props: {
     currentWork: {
       type: Object,
@@ -45,9 +107,10 @@ export default {
   },
   data() {
     return {
-      formData: null,
       work: { ...this.currentWork },
-      changePhoto: false
+      renderedPhoto: "",
+      loading: false,
+      drag: false
     };
   },
   computed: {
@@ -55,45 +118,88 @@ export default {
       if (this.work.techs.length) {
         return this.work.techs.split(",");
       }
+    },
+    photoURL() {
+      return `https://webdev-api.loftschool.com/${this.currentWork.photo}`;
     }
   },
   methods: {
-    ...mapActions("works", ["editWork"]),
+    ...mapActions("works", ["editWork", "changeEditMode"]),
+    ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
-      this.changePhoto = true;
-      this.formData.append("photo", event.target.files[0]);
+      this.drag = false;
+      if (event.target.files[0]) {
+        const file = event.target.files[0];
+        this.work.photo = file;
+        this.renderImage(file);
+      }
+    },
+    renderImage(file) {
+      const reader = new FileReader();
+      try {
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+          this.renderedPhoto = reader.result;
+        };
+      } catch (error) {
+        this.showTooltip({ error: "Ошибка чтения файла" });
+      }
     },
     async editCurrentWork() {
       try {
-        if (this.changePhoto) {
-          this.createWork();
-          await this.editWork({ data: this.formData, id: this.work.id });
-        } else {
-          await this.editWork({ data: this.work, id: this.work.id });
-        }
-        this.cancellEditMode();
+        let valid = await this.$validate();
+        if (!valid) return;
+        this.loading = true;
+        await this.editWork(this.work);
+        this.showTooltip({ success: "Изменения внесены" });
+        this.changeEditMode(false);
       } catch (error) {
-        alert(error.message);
+        this.showTooltip({ error: error.message });
+      } finally {
+        this.loading = false;
       }
     },
-    createWork() {
-      this.formData.append("title", this.work.title);
-      this.formData.append("techs", this.work.techs);
-      this.formData.append("link", this.work.link);
-      this.formData.append("description", this.work.description);
-    },
     cancellEditMode() {
-      this.$emit("cancellEditMode");
+      this.changeEditMode(false);
+    },
+    async checkField(field) {
+      await this.$validate(field);
+    },
+    removeTag(index) {
+      let tagArray = [...this.tagsList];
+      tagArray.splice(index, 1);
+      this.work.techs = tagArray.join(", ");
     }
-  },
-  created() {
-    this.formData = new FormData();
   }
 };
 </script>
 
 <style lang="postcss" scoped>
 @import "../../styles/mixins.pcss";
+
+.validate {
+  position: absolute;
+  color: #fff;
+  background-color: $red;
+  font-size: 14px;
+  padding: 8px 12px;
+  left: 20px;
+  bottom: 0;
+  transform: translateY(100%);
+  line-height: 1.2;
+  display: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: $red;
+    top: -5px;
+    left: 50%;
+    transform: translate(-50%) rotate(45deg);
+  }
+}
 
 .redact-form {
   position: relative;
@@ -141,7 +247,7 @@ export default {
       border-color: $red;
     }
 
-    & .block-validate {
+    & .validate {
       display: block;
     }
   }
@@ -235,35 +341,74 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 280px;
-  background: linear-gradient(to right, #949494 50%, transparent 0%) top / 20px
-      1px repeat-x,
-    linear-gradient(#949494 50%, transparent 0%) right / 1px 20px repeat-y,
-    linear-gradient(to left, #949494 50%, transparent 0%) bottom / 20px 1px
-      repeat-x,
-    linear-gradient(to top, #949494 50%, transparent 0%) left / 1px 20px
-      repeat-y,
-    $grey;
+}
 
-  &.error {
-    border: 1px solid $red;
-    & .block-validate {
-      display: block;
+.image-load__photo {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-position: top center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border: 1px solid transparent;
+  height: 25vw;
+  max-height: 400px;
+
+  @include desktop {
+    height: 35vw;
+    max-height: 300px;
+  }
+
+  @include tablets {
+    height: 45vw;
+  }
+
+  &.filled {
+    .image-load__pic {
+      display: none;
     }
   }
+
+  &.loaded {
+    opacity: 0.7;
+    border: 1px dashed $blue;
+  }
+}
+
+.image-load__pic {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-load__photo-file {
+  position: absolute;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
+
+.image-load__field {
+  margin-top: 10px;
+  padding: 20px 30px;
 }
 
 .image-load__file {
   display: none;
 }
 
-.image-load__text {
-  max-width: 230px;
-  opacity: 0.5;
-  line-height: 1.7;
-  margin-bottom: 30px;
+.image-load__link {
+  cursor: pointer;
+  display: block;
   text-align: center;
-  font-weight: 600;
+  color: $blue;
+  font-weight: 700;
+  font-size: 16px;
 }
 
 .edit-block {
@@ -328,6 +473,12 @@ export default {
   background: linear-gradient(to right, $light-blue, $blue);
   padding: 15px 30px;
   border-radius: 30px;
+
+  &:disabled {
+    filter: grayscale(90%);
+    opacity: 0.8;
+    pointer-events: none;
+  }
 }
 
 .cancel-btn {

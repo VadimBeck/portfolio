@@ -4,22 +4,24 @@
   background-color: $text-color;
   transition: .2s;
   outline: none;
-  
-  &:hover, &:active {
+
+  &:hover,
+  &:active {
     background-color: $blue-violet;
   }
 
   &--next {
     transform: rotate(-90deg);
   }
+
   &--prev {
     transform: rotate(90deg);
   }
 
   &.is-active {
-    .direction-btn__arrow {     
-        opacity: 1;    
-    }    
+    .direction-btn__arrow {
+      opacity: 1;
+    }
   }
 }
 

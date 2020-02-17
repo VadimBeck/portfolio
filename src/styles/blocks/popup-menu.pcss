@@ -1,8 +1,11 @@
 .popup-menu {
   position: absolute;
+  display: flex;
   flex-direction: column;
   justify-content: center;
-  display: none;
+  transform: translate(100%);
+  transition: transform ease .5s;
+  visibility: hidden;
   height: 100vh;
   padding: 65px;
   right: 0;
@@ -11,14 +14,34 @@
   font-weight: 600;
   width: 100%;
   max-width: 320px;
-
-  &.is-active {
-    display: flex;        
-    background: #fff;
-  }
+  background: #fff;
 
   @include phones {
     max-width: none;
     width: 100%;
+    padding: 65px 25vw;
   }
+
+  &.is-active {
+    transition: transform ease .5s;
+    transform: translate(0);
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    transform: translateY(100%);
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(#fff, rgba(#fff, 0));
+  }
+}
+
+.popup-menu__close {
+  position: absolute;
+  top: 75px;
+  right: 25px;
+  transition: 0s;
 }

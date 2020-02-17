@@ -5,28 +5,75 @@
       .review-edit
         .review-edit__image
           .avatar-load
-            .avatar-load__image
             label.avatar-load__field
-              .avatar-load__desc Добавить фото
-              input.avatar-load__file(type="file")
+              .avatar-load__image(
+                :class="[{filled: renderedPhoto.length}, {loaded:drag}]"
+                :style="{backgroundImage: `url(${renderedPhoto})`}"
+              )
+                img.avatar-load__pic(:src="photoURL")
+              .avatar-load__desc Изменить фото
+              input.avatar-load__file(
+                type="file"
+                @change="loadFile"
+                @drop="loadFile"
+                @dragover="drag=true"
+                @dragleave="drag=false"
+              )
         .review-edit__form            
           label.redact-form__row
-            .redact-form__block(data-title="Имя автора")
-              input.redact-form__entry.input(type="text" v-model="currentReview.author")
-            .redact-form__block(data-title="Титул автора")
-              input.redact-form__entry.input(type="text" v-model="currentReview.occ")
+            .redact-form__block(
+              data-title="Имя автора"
+              :class="{error: validation.hasError('review.author')}"
+            )
+              input.redact-form__entry.input(
+                type="text" 
+                v-model="review.author"
+                @input="checkField('review.author')"
+              )
+              div.validate {{validation.firstError('review.author')}}
+            .redact-form__block(
+              data-title="Титул автора"
+              :class="{error: validation.hasError('review.occ')}"
+            )
+              input.redact-form__entry.input(
+                type="text" 
+                v-model="review.occ"
+                @input="checkField('review.occ')"
+              )
+              div.validate {{validation.firstError('review.occ')}}
           label.redact-form__row
-            .redact-form__block.redact-form__block--no-border(data-title="Отзыв")
-              textarea.redact-form__entry.textarea(name="textarea" type="text" v-model="currentReview.text")              
+            .redact-form__block.redact-form__block--no-border(
+              data-title="Отзыв"
+              :class="{error: validation.hasError('review.text')}"
+            )
+              textarea.redact-form__entry.textarea(
+                name="textarea" 
+                type="text" v-model="review.text"
+                @input="checkField('review.text')"
+              )
+              div.validate {{validation.firstError('review.text')}}
           .redact-form__buttons
             button.cancel-btn(@click.prevent="cancellEditMode") Отмена
-            button.action-btn(type="submit") Сохранить
+            button.action-btn(type="submit" :disabled="loading") Сохранить
 </template>
 
 <script>
 import { mapActions } from "vuex";
+import { Validator } from "simple-vue-validator";
 
 export default {
+  mixins: [require("simple-vue-validator").mixin],
+  validators: {
+    "review.author"(value) {
+      return Validator.value(value).required("Заполните имя");
+    },
+    "review.occ"(value) {
+      return Validator.value(value).required("Заполните титул");
+    },
+    "review.text"(value) {
+      return Validator.value(value).required("Заполните отзыв");
+    }
+  },
   props: {
     currentReview: {
       type: Object,
@@ -36,47 +83,89 @@ export default {
   },
   data() {
     return {
-      formData: null,
       review: { ...this.currentReview },
-      changePhoto: false
+      renderedPhoto: "",
+      loading: false,
+      drag: false
     };
   },
+  computed: {
+    photoURL() {
+      return `https://webdev-api.loftschool.com/${this.currentReview.photo}`;
+    }
+  },
   methods: {
-    ...mapActions("reviews", ["editReview"]),
+    ...mapActions("reviews", ["editReview", "changeEditMode"]),
+    ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
-      this.changePhoto = true;
-      this.formData.append("photo", event.target.files[0]);
+      this.drag = false;
+      if (event.target.files[0]) {
+        const file = event.target.files[0];
+        this.review.photo = file;
+        this.renderImage(file);
+      }
+    },
+    renderImage(file) {
+      const reader = new FileReader();
+      try {
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+          this.renderedPhoto = reader.result;
+        };
+      } catch (error) {
+        this.showTooltip({ error: "Ошибка чтения файла" });
+      }
     },
     async editCurrentReview() {
       try {
-        if (this.changePhoto) {
-          this.createReview();
-          await this.editReview({ data: this.formData, id: this.review.id });
-        } else {
-          await this.editReview({ data: this.review, id: this.review.id });
-        }
-        this.cancellEditMode();
+        let valid = await this.$validate();
+        if (!valid) return;
+        this.loading = true;
+        await this.editReview(this.review);
+        this.showTooltip({ success: "Изменения внесены" });
+        this.changeEditMode(false);
       } catch (error) {
-        alert(error.message);
+        this.showTooltip({ error: error.message });
+      } finally {
+        this.loading = false;
       }
     },
-    createReview() {
-      this.formData.append("author", this.newReview.author);
-      this.formData.append("occ", this.newReview.occ);
-      this.formData.append("text", this.newReview.text);
-    },
     cancellEditMode() {
-      this.$emit("cancellEditMode");
+      this.changeEditMode(false);
+    },
+    async checkField(field) {
+      await this.$validate(field);
     }
-  },
-  created() {
-    this.formData = new FormData();
   }
 };
 </script>
 
 <style lang="postcss" scoped>
 @import "../../styles/mixins.pcss";
+
+.validate {
+  position: absolute;
+  color: #fff;
+  background-color: $red;
+  font-size: 14px;
+  padding: 8px 12px;
+  left: 20px;
+  bottom: 0;
+  transform: translateY(100%);
+  line-height: 1.2;
+  display: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: $red;
+    top: -5px;
+    left: 50%;
+    transform: translate(-50%) rotate(45deg);
+  }
+}
 
 .redact-form {
   position: relative;
@@ -124,7 +213,7 @@ export default {
       border-color: $red;
     }
 
-    & .block-validate {
+    & .validate {
       display: block;
     }
   }
@@ -219,18 +308,44 @@ export default {
 }
 
 .avatar-load__file {
-  display: none;
+  position: absolute;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  opacity: 0;
 }
 
 .avatar-load__image {
+  cursor: pointer;
+  background-position: top center;
+  background-size: cover;
+  background-repeat: no-repeat;
   width: 200px;
   height: 200px;
   border-radius: 50%;
-  background-color: #dee4ed;
+  overflow: hidden;
   margin-bottom: 20px;
-  background: svg-load("user.svg", fill= "#fff") center center / 50% 50%
-      no-repeat,
-    #dee4ed;
+
+  &.filled {
+    .avatar-load__pic {
+      display: none;
+    }
+  }
+
+  &.loaded {
+    opacity: 0.7;
+    outline: 1px dashed $blue;
+  }
+}
+
+.avatar-load__pic {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
 }
 
 .avatar-load__link {
@@ -267,6 +382,12 @@ export default {
   background: linear-gradient(to right, $light-blue, $blue);
   padding: 15px 30px;
   border-radius: 30px;
+
+  &:disabled {
+    filter: grayscale(90%);
+    opacity: 0.8;
+    pointer-events: none;
+  }
 }
 
 .cancel-btn {

@@ -1,39 +1,43 @@
-.menu {  
+.menu {
   & .menu__item {
     &:hover {
       color: $blue-violet;
     }
-  }  
+  }
 
   &--footer {
     & .menu__item {
       &:hover {
         color: $dark-grey;
-      }     
+      }
     }
+
     @include tablets {
       & .menu__list {
         flex-wrap: wrap;
         justify-content: flex-start;
       }
+
       & .menu__item {
         margin-bottom: 20px;
-        flex-basis: calc(100%/4);        
+        flex-basis: calc(100%/4);
       }
-    } 
+    }
 
     @include phones {
       & .menu__item {
-        flex-basis: calc(100%/2);        
+        flex-basis: calc(100%/2);
       }
-    } 
+    }
   }
 
   &--popup-menu {
     margin-bottom: 40px;
+
     & .menu__list {
       flex-direction: column;
     }
+
     & .menu__item {
       margin-bottom: 20px;
     }

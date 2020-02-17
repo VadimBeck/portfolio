@@ -1,4 +1,9 @@
 import Vue from "vue";
+import axios from "axios";
+
+const $axios = axios.create({
+  baseURL: "https://webdev-api.loftschool.com"
+});
 
 const thumbs = {
   template: "#slider-thumbs",
@@ -13,12 +18,11 @@ const buttons = {
 const display = {
   template: "#slider-display",
   components: {
-    thumbs, buttons
+    thumbs,
+    buttons
   },
-  props: ["works", "displayedWorks","currentWork", "currentIndex"],
-  computed: {}
+  props: ["works", "displayedWorks", "currentWork", "currentIndex"]
 };
-
 
 const tags = {
   template: "#slider-tags",
@@ -27,13 +31,18 @@ const tags = {
 
 const info = {
   template: "#slider-info",
+  props: {
+    currentWork: Object
+  },
   components: {
     tags
   },
-  props: ["currentWork"],
   computed: {
     tagsArray() {
-      return this.currentWork.skills.split(', ');
+      return this.currentWork ? this.currentWork.techs.split(", "): ' ';
+    },
+    work() {
+      return {...this.currentWork}
     }
   }
 };
@@ -42,7 +51,8 @@ new Vue({
   el: "#slider-component",
   template: "#slider-container",
   components: {
-    display, info
+    display,
+    info
   },
   data() {
     return {
@@ -51,39 +61,32 @@ new Vue({
       startIndex: 0,
       displayedCount: 4,
       windowWidth: 0
-    }
+    };
   },
   computed: {
     currentWork() {
       return this.works[this.currentIndex];
     },
     displayedWorks() {
-      return [...this.works].splice(this.startIndex, this.displayedCount)
+      return [...this.works].splice(this.startIndex, this.displayedCount);
     }
   },
   methods: {
-    makeArrayWithRequiredPics(data) {
-      return data.map(item => {
-        const requiredPic = require(`../images/content/${item.photo}`);
-        item.photo = requiredPic;
-
-        return item;
-      })
-    },
-
     handleSlide(direction) {
-      if(direction=="next" && this.currentIndex < this.works.length - 1) {
+      if (direction == "next" && this.currentIndex < this.works.length - 1) {
         this.currentIndex++;
         this.moveDisplayedWorks();
-      }
-      else if (direction=="prev" && this.currentIndex > 0) {
-        this.currentIndex--; 
+      } else if (direction == "prev" && this.currentIndex > 0) {
+        this.currentIndex--;
         this.moveDisplayedWorks();
-      }      
+      }
     },
 
     moveDisplayedWorks() {
-      if (this.currentIndex > (this.displayedWorks.length-1) + this.startIndex) {
+      if (
+        this.currentIndex >
+        this.displayedWorks.length - 1 + this.startIndex
+      ) {
         this.startIndex++;
       } else if (this.currentIndex < this.startIndex) {
         this.startIndex--;
@@ -99,18 +102,33 @@ new Vue({
       }
     },
 
+    takeImgAbsolutePath(data) {
+      return data.map(item => {
+
+        item.photo = `https://webdev-api.loftschool.com/${item.photo}`;
+
+        return item;
+      });
+    },
+
+    fetchWorks() {
+      $axios
+        .get("/works/253")
+        .then(response => {
+          let data = response.data;
+          this.works = this.takeImgAbsolutePath(data);
+        });
+    },
+
     checkActiveWork(index) {
-      this.currentIndex = index + this.startIndex;      
+      this.currentIndex = index + this.startIndex;
     }
   },
-  watch: {
-  },
   created() {
-    const data = require("../data/works.json");
-    this.works = this.makeArrayWithRequiredPics(data);
+    this.fetchWorks();
   },
   mounted() {
-    window.addEventListener('resize', this.changeDisplayedCount);
+    window.addEventListener("resize", this.changeDisplayedCount);
     this.changeDisplayedCount();
   }
 });

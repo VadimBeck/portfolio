@@ -1,4 +1,4 @@
-section.intro
+section#intro.intro
   .container.intro__container
     header.header.intro__header
       .intro__logo
@@ -19,12 +19,7 @@ section.intro
         .user-info__name Вадим Бекитко
     .intro__buttons
       .scroll
-        a.scroll__link(href="#")
+        a.scroll__link(href="#about")
           span.scroll__text Скролл
           +icon('scroll', 'scroll__img')
-  .popup-menu
-    button.close-btn
-    .popup-menu__menu
-      +menu("popup-menu")
-    .popup-menu__socials
-      +socials("popup-menu")
+  include ./popup-menu

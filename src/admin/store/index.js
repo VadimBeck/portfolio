@@ -7,12 +7,16 @@ import categories from "./modules/categories";
 import skills from "./modules/skills";
 import works from "./modules/works";
 import reviews from "./modules/reviews";
+import tooltip from "./modules/tooltip";
+import user from "./modules/user";
 
 export default new Vuex.Store({
   modules: {
     categories,
     skills,
     works,
-    reviews
+    reviews,
+    tooltip,
+    user
   }
 });

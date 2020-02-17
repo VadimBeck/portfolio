@@ -18,6 +18,7 @@
             category-item(
               :category="category"
             )
+    tooltip
 </template>
 
 <script>
@@ -26,7 +27,8 @@ import { mapActions, mapState } from "vuex";
 export default {
   components: {
     categoryForm: () => import("../categoryForm"),
-    categoryItem: () => import("../categoryItem")
+    categoryItem: () => import("../categoryItem"),
+    tooltip: () => import("../tooltip")
   },
   props: [],
   data() {
@@ -46,7 +48,7 @@ export default {
     },
     cancelAddCategory() {
       this.addCategoryMode = false;
-    }
+    },    
   },
   created() {
     this.fetchCategories();
@@ -133,6 +135,19 @@ export default {
 
   @include phones {
     width: calc(100%-30px);
+  }
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  padding: 50px 0 50px;
+  font-size: 24px;
+
+  @include phones {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 50px 0 50px 20px;
   }
 }
 </style>

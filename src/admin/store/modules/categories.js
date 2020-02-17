@@ -1,3 +1,5 @@
+import errorHandler from "../../helpers/errorHandler";
+
 export default {
   namespaced: true,
   state: {
@@ -52,12 +54,10 @@ export default {
   actions: {
     async addCategory({ commit }, title) {
       try {
-        const { data } = await this.$axios.post("/categories", { title });
-        commit("ADD_CATEGORY", data);
-      } catch (error) {
-        throw new Error(
-          error.response.data.error || error.response.data.message
-        );
+        const response = await this.$axios.post("/categories", { title });        
+        commit("ADD_CATEGORY", response.data);
+      } catch (error) {        
+        errorHandler(error);
       }
     },
     async editCategory({ commit }, category) {
@@ -67,9 +67,7 @@ export default {
         });
         commit("EDIT_CATEGORY", data.category);
       } catch (error) {
-        throw new Error(
-          error.response.data.error || error.response.data.message
-        );
+        errorHandler(error);
       }
     },
     async fetchCategories({ commit }) {
@@ -77,9 +75,7 @@ export default {
         const { data } = await this.$axios.get("/categories/253");
         commit("SET_CATEGORIES", data);
       } catch (error) {
-        throw new Error(
-          error.response.data.error || error.response.data.message
-        );
+        errorHandler(error);
       }
     }
   }

@@ -1,5 +1,7 @@
 .skills-row__list {
   display: flex;
+  margin-right: -30px;
+
   @include phones {
     flex-wrap: wrap;
     margin-right: -15px;
@@ -7,12 +9,10 @@
 }
 
 .skills-row__item {
-  width: 155px;
+  width: calc(100%/4-30px);
+  max-width: 155px;
   margin-right: 30px;
-
-  &:last-child {
-    margin-right: 0;
-  }
+  flex-shrink: 0;
 
   @include phones {
     margin-right: 15px;
