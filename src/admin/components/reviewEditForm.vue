@@ -7,7 +7,7 @@
           .avatar-load
             label.avatar-load__field
               .avatar-load__image(
-                :class="{filled: renderedPhoto.length}"
+                :class="[{filled: renderedPhoto.length}, {loaded:drag}]"
                 :style="{backgroundImage: `url(${renderedPhoto})`}"
               )
                 img.avatar-load__pic(:src="photoURL")
@@ -15,6 +15,9 @@
               input.avatar-load__file(
                 type="file"
                 @change="loadFile"
+                @drop="loadFile"
+                @dragover="drag=true"
+                @dragleave="drag=false"
               )
         .review-edit__form            
           label.redact-form__row
@@ -82,7 +85,8 @@ export default {
     return {
       review: { ...this.currentReview },
       renderedPhoto: "",
-      loading: false
+      loading: false,
+      drag: false
     };
   },
   computed: {
@@ -94,9 +98,12 @@ export default {
     ...mapActions("reviews", ["editReview", "changeEditMode"]),
     ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
-      const file = event.target.files[0];
-      this.review.photo = file;
-      this.renderImage(file);
+      this.drag = false;
+      if (event.target.files[0]) {
+        const file = event.target.files[0];
+        this.review.photo = file;
+        this.renderImage(file);
+      }
     },
     renderImage(file) {
       const reader = new FileReader();
@@ -301,7 +308,13 @@ export default {
 }
 
 .avatar-load__file {
-  display: none;
+  position: absolute;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  opacity: 0;
 }
 
 .avatar-load__image {
@@ -319,6 +332,11 @@ export default {
     .avatar-load__pic {
       display: none;
     }
+  }
+
+  &.loaded {
+    opacity: 0.7;
+    outline: 1px dashed $blue;
   }
 }
 

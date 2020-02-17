@@ -5,13 +5,16 @@
       .work-edit      
         .work-edit__image
           .image-load(
-            :class="[{error: validation.hasError('renderedPhoto')}, {filled: renderedPhoto.length}]"
+            :class="[{error: validation.hasError('renderedPhoto')}, {filled: renderedPhoto.length}, {loaded:drag}]"
             :style="{backgroundImage: `url(${renderedPhoto})`}"
           )
-            label.image-load__field
+            label.image-load__field(:class="{loaded:drag}")
               input.image-load__file(
                   type="file" 
                   @change="loadFile"
+                  @drop="loadFile"
+                  @dragover="drag=true"
+                  @dragleave="drag=false"
                 )
               .image-load__text Перетащите или загрузите для загрузки изображения
               .action-btn Загрузить              
@@ -104,7 +107,8 @@ export default {
         description: ""
       },
       renderedPhoto: "",
-      loading: false
+      loading: false,
+      drag: false
     };
   },
   computed: {
@@ -118,9 +122,12 @@ export default {
     ...mapActions("works", ["addWork", "changeAddMode"]),
     ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
-      const file = event.target.files[0];
-      this.newWork.photo = file;
-      this.renderImage(file);
+      this.drag = false;
+      if (event.target.files[0]) {
+        const file = event.target.files[0];
+        this.newWork.photo = file;
+        this.renderImage(file);
+      }
     },
     renderImage(file) {
       const reader = new FileReader();
@@ -360,6 +367,7 @@ export default {
     }
     & .image-load__field {
       background: $grey;
+      border-color: transparent;
     }
   }
   &.filled {
@@ -370,6 +378,10 @@ export default {
     .image-load__field {
       background: none;
     }
+  }
+
+  &.filled.loaded {
+    opacity: 0.7;
   }
 }
 
@@ -386,13 +398,26 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  border: 1px solid transoarent;
   cursor: pointer;
   width: 100%;
   min-height: 280px;
+
+  &.loaded {
+    opacity: 0.8;
+    border: 1px dashed $blue;
+    background: $grey;
+  }
 }
 
 .image-load__file {
-  display: none;
+  position: absolute;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  opacity: 0;
 }
 
 .image-load__text {

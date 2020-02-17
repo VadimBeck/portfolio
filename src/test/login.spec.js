@@ -31,6 +31,12 @@ test('На странице есть кнопка "Авторизоваться"
 
 test("Форма имеет все необходимые поля", () => {
   return client
+    .isVisible(".login__form")
+    .then(browsers => {
+      for (const browserName in browsers) {
+        expect(browsers[browserName]).toBe(true);
+      }
+    })
     .isExisting(".login__input--name")
     .then(browsers => {
       for (const browserName in browsers) {

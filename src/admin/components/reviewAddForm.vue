@@ -7,13 +7,16 @@
           .avatar-load(:class="{error: validation.hasError('renderedPhoto')}")
             label.avatar-load__field
               .avatar-load__image(
-                :class="{filled: renderedPhoto.length}"
+                :class="[{filled: renderedPhoto.length}, {loaded:drag}]"
                 :style="{backgroundImage: `url(${renderedPhoto})`}"
               )
               .avatar-load__desc Добавить фото
               input.avatar-load__file(
                 type="file" 
                 @change="loadFile"
+                @drop="loadFile"
+                @dragover="drag=true"
+                @dragleave="drag=false"
               )
             div.validate {{validation.firstError('renderedPhoto')}}
         .review-edit__form            
@@ -83,16 +86,20 @@ export default {
         text: ""
       },
       renderedPhoto: "",
-      loading: false
+      loading: false,
+      drag: false
     };
   },
   methods: {
     ...mapActions("reviews", ["addReview", "changeAddMode"]),
     ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
-      const file = event.target.files[0];
-      this.newReview.photo = file;
-      this.renderImage(file);
+      this.drag = false;
+      if (event.target.files[0]) {
+        const file = event.target.files[0];
+        this.newReview.photo = file;
+        this.renderImage(file);
+      }
     },
     renderImage(file) {
       const reader = new FileReader();
@@ -303,11 +310,20 @@ export default {
       left: 50%;
       transform: translate(-50%, 100%);
     }
+    & .avatar-load__image {
+      outline: none;
+    }
   }
 }
 
 .avatar-load__file {
-  display: none;
+  position: absolute;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  opacity: 0;
 }
 
 .avatar-load__image {
@@ -321,12 +337,16 @@ export default {
   border-radius: 50%;
   background-color: #dee4ed;
   margin-bottom: 20px;
-  background-color: #dee4ed;
 
   &.filled {
     &::after {
       display: none;
     }
+  }
+
+  &.loaded {
+    opacity: 0.7;
+    outline: 1px dashed $blue;
   }
 
   &::after {

@@ -6,10 +6,18 @@
         .work-edit__image
           .image-load
             .image-load__photo(
-              :class="{filled: renderedPhoto.length}"
+              :class="[{filled: renderedPhoto.length}, {loaded:drag}]"
               :style="{backgroundImage: `url(${renderedPhoto})`}"
             )
               img.image-load__pic(:src="photoURL")
+              label.image-load__photo-field
+                input.image-load__photo-file(
+                  type="file"
+                  @change="loadFile"
+                  @drop="loadFile"
+                  @dragover="drag=true"
+                  @dragleave="drag=false"
+                )
             label.image-load__field
               input.image-load__file(
                 type="file" 
@@ -101,7 +109,8 @@ export default {
     return {
       work: { ...this.currentWork },
       renderedPhoto: "",
-      loading: false
+      loading: false,
+      drag: false
     };
   },
   computed: {
@@ -118,9 +127,12 @@ export default {
     ...mapActions("works", ["editWork", "changeEditMode"]),
     ...mapActions("tooltip", ["showTooltip"]),
     loadFile(event) {
-      const file = event.target.files[0];
-      this.work.photo = file;
-      this.renderImage(file);
+      this.drag = false;
+      if (event.target.files[0]) {
+        const file = event.target.files[0];
+        this.work.photo = file;
+        this.renderImage(file);
+      }
     },
     renderImage(file) {
       const reader = new FileReader();
@@ -333,22 +345,34 @@ export default {
 
 .image-load__photo {
   overflow: hidden;
+  position: relative;
   width: 100%;
   height: 100%;
   background-position: top center;
   background-size: cover;
   background-repeat: no-repeat;
-  min-height: 340px;
+  border: 1px solid transparent;
+  height: 25vw;
   max-height: 400px;
 
   @include desktop {
-    min-height: 280px;
+    height: 35vw;
+    max-height: 300px;
+  }
+
+  @include tablets {
+    height: 45vw;
   }
 
   &.filled {
     .image-load__pic {
       display: none;
     }
+  }
+
+  &.loaded {
+    opacity: 0.7;
+    border: 1px dashed $blue;
   }
 }
 
@@ -357,6 +381,16 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.image-load__photo-file {
+  position: absolute;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  opacity: 0;
 }
 
 .image-load__field {

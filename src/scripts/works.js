@@ -124,8 +124,6 @@ new Vue({
       this.currentIndex = index + this.startIndex;
     }
   },
-  watch: {
-  },
   created() {
     this.fetchWorks();
   },
