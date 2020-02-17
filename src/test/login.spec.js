@@ -80,6 +80,25 @@ test('Кнопка "Отправить" заблокирована до тех �
           "base64"
         );
       }
+    })
+    .addValue(".login__input--name", "test")
+    .addValue(".login__input--password", "1234")
+    .pause(500)
+    .getAttribute(".send-button", "disabled")
+    .then(browsers => {
+      for (const browserName in browsers) {
+        expect(browsers[browserName]).toBe(null);
+      }
+    })
+    .screenshot()
+    .then(screenshots => {
+      for (const browserName in screenshots) {
+        fs.writeFileSync(
+          `./screenshots/login_form_enabled_btn_${browserName}.png`,
+          screenshots[browserName].value,
+          "base64"
+        );
+      }
     });
 });
 
