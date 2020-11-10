@@ -63,10 +63,9 @@
     "last 2 versions"
   ],
   "dependencies": {
-    "acorn": "6.4.1",
+    "acorn": "5.7.4",
     "axios": "^0.18.0",
-    "bl": "3.0.1",
-    "dot-prop": "4.2.1",
+    "dot-prop": "5.1.1",
     "elliptic": "6.5.3",
     "kind-of": "6.0.3",
     "lodash": "4.17.19",
