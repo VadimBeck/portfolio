@@ -65,11 +65,13 @@
   "dependencies": {
     "acorn": "6.4.1",
     "axios": "^0.18.0",
+    "bl": "3.0.1",
     "dot-prop": "4.2.1",
     "elliptic": "6.5.3",
     "kind-of": "6.0.3",
     "lodash": "4.17.19",
     "minimist": "1.2.3",
+    "node-forge": "0.10.0",
     "normalize.css": "^8.0.1",
     "pug": "^2.0.3",
     "serialize-javascript": "3.1.0",
@@ -77,6 +79,7 @@
     "vue": "^2.6.7",
     "vue-flickity": "^1.2.1",
     "vue-router": "^3.0.2",
-    "vuex": "^3.1.0"
+    "vuex": "^3.1.0",
+    "yargs-parser": "13.1.2"
   }
 }
