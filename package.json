@@ -65,6 +65,7 @@
   "dependencies": {
     "acorn": "5.7.4",
     "axios": "^0.18.0",
+    "bl": "3.0.1",
     "dot-prop": "5.1.1",
     "elliptic": "6.5.3",
     "kind-of": "6.0.3",
