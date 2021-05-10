@@ -69,7 +69,7 @@
     "dot-prop": "5.1.1",
     "elliptic": "6.5.4",
     "kind-of": "6.0.3",
-    "lodash": "4.17.19",
+    "lodash": "4.17.21",
     "minimist": "1.2.3",
     "node-forge": "0.10.0",
     "normalize.css": "^8.0.1",
